@@ -19,13 +19,13 @@ test("country and domain filters narrow the catalogue", async ({ page }) => {
   await page.goto("/catalogue");
   await page.getByLabel("Country").selectOption("IN");
   await expect(page.getByRole("heading", { name:"Arjun Main Battle Tank Mk IA" })).toBeVisible();
-  await expect(page.getByRole("heading", { name:"LCA Tejas" })).toBeVisible();
+  await expect(page.getByRole("heading", { level:3, name:"Light Combat Aircraft (LCA) Tejas" })).toBeVisible();
   await expect(page.getByRole("heading", { name:"M1 Abrams Main Battle Tank" })).toHaveCount(0);
 });
 
 test("equipment profile presents provenance and source links", async ({ page }) => {
   await page.goto("/equipment/lca-tejas");
-  await expect(page.getByRole("heading", { name:"Light Combat Aircraft (LCA) Tejas" })).toBeVisible();
+  await expect(page.locator("h1", { hasText:"Light Combat Aircraft (LCA) Tejas" })).toBeVisible();
   await expect(page.getByRole("heading", { name:"References & verification" })).toBeVisible();
   await expect(page.getByRole("link", { name:/Open source/i })).toBeVisible();
 });
