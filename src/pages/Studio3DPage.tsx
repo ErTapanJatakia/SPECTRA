@@ -362,9 +362,9 @@ function PerformanceSampler({ onSample }: { onSample: (sample: PerformanceSample
   return null;
 }
 
-function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark, dpr, onPerformanceSample }: {
+function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark, dpr, reducedMotion, onPerformanceSample }: {
   modelUrl: string | null; showAnnotations: boolean; selectedAnnotation: string;
-  onSelect: (id: string) => void; resetKey: number; dark: boolean; dpr: number;
+  onSelect: (id: string) => void; resetKey: number; dark: boolean; dpr: number; reducedMotion: boolean;
   onPerformanceSample: (sample: PerformanceSample) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -373,6 +373,10 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
   const handleCreated = useCallback(({ gl }: { gl: { domElement: HTMLCanvasElement } }) => {
     contextCleanupRef.current?.();
     const canvas = gl.domElement;
+    canvas.tabIndex = 0;
+    canvas.setAttribute("role", "application");
+    canvas.setAttribute("aria-label", "Interactive 3D model viewport. Use the mouse, touch gestures, or the Reset view control to navigate.");
+    canvas.setAttribute("aria-describedby", "studio-viewport-instructions");
     const handleContextLost = (event: Event) => {
       event.preventDefault();
       setContextLost(true);
@@ -404,7 +408,7 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
         </ModelErrorBoundary>
       </Suspense>
       <PerformanceSampler onSample={onPerformanceSample} />
-      <OrbitControls key={resetKey} makeDefault enableDamping dampingFactor={0.08} minDistance={2} maxDistance={18} />
+      <OrbitControls key={resetKey} makeDefault enableDamping={!reducedMotion} dampingFactor={reducedMotion ? 0 : 0.08} minDistance={2} maxDistance={18} />
     </Canvas>
     {contextLost && <div className="studio-canvas-error" role="alert">The WebGL context was lost. The viewer will resume if the browser restores graphics access; otherwise reload the page or use the text-based model notes.</div>}
     </>
@@ -424,6 +428,7 @@ export default function Studio3DPage() {
   const [dark, setDark] = useState(true);
   const [performance, setPerformance] = useState<PerformanceSample>({ fps: 0, geometries: 0, textures: 0, drawCalls: 0 });
   const [renderDpr, setRenderDpr] = useState(1.25);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   const handlePerformanceSample = useCallback((sample: PerformanceSample) => {
     setPerformance(sample);
@@ -434,7 +439,12 @@ export default function Studio3DPage() {
   }, []);
 
   useEffect(() => {
+    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotionPreference = () => setReducedMotion(motionQuery.matches);
+    updateMotionPreference();
+    motionQuery.addEventListener("change", updateMotionPreference);
     if (window.matchMedia("(max-width: 600px)").matches) setRenderDpr(1);
+    return () => motionQuery.removeEventListener("change", updateMotionPreference);
   }, []);
 
   useEffect(() => () => { if (modelUrl) { useGLTF.clear(modelUrl); URL.revokeObjectURL(modelUrl); } }, [modelUrl]);
@@ -479,17 +489,18 @@ export default function Studio3DPage() {
             <div><span className="eyebrow">INTERACTIVE VIEWPORT</span><strong>{modelUrl ? "LOCAL MODEL" : "DEMONSTRATION SCENE"}</strong></div>
             <div className="studio-toolbar-actions">
               <button className="studio-tool-button" onClick={() => setShowAnnotations((value) => !value)} aria-pressed={showAnnotations}><Icon name="map" size={15} /> {showAnnotations ? "Hide labels" : "Show labels"}</button>
-              <button className="studio-tool-button" onClick={() => setResetKey((value) => value + 1)}><Icon name="arrow" size={15} /> Reset view</button>
+              <button className="studio-tool-button" onClick={() => setResetKey((value) => value + 1)} aria-label="Reset 3D viewport camera"><Icon name="arrow" size={15} /> Reset view</button>
               <button className="studio-tool-button" onClick={() => setDark((value) => !value)} aria-pressed={dark}><Icon name="sun" size={15} /> Lighting</button>
             </div>
           </div>
           <div className="studio-canvas-wrap">
+            <p id="studio-viewport-instructions" className="studio-sr-only">The 3D viewport is keyboard focusable. Use the Reset view button to restore the default view. Annotation controls are available in the Explore features panel. The viewport also supports pointer and touch navigation.</p>
             <Scene modelUrl={modelUrl} showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation}
-              onSelect={setSelectedAnnotation} resetKey={resetKey} dark={dark} dpr={renderDpr} onPerformanceSample={handlePerformanceSample} />
+              onSelect={setSelectedAnnotation} resetKey={resetKey} dark={dark} dpr={renderDpr} reducedMotion={reducedMotion} onPerformanceSample={handlePerformanceSample} />
             <div className="studio-viewer-hint"><span>DRAG · ORBIT</span><span>SCROLL · ZOOM</span><span>RIGHT-DRAG · PAN</span></div>
           </div>
           <div className="studio-viewer-caption"><span><i className="studio-status-dot" /> Browser-local rendering</span><span>No model is uploaded to SPECTRA servers</span></div>
-          <div className="studio-performance" role="status" aria-live="polite" aria-label="3D performance monitor">
+          <div className="studio-performance" role="group" aria-label="3D performance monitor" aria-live="off">
             <strong>PERFORMANCE MONITOR</strong>
             <span>{performance.fps ? `${performance.fps} FPS` : "Sampling frame rate…"}</span>
             <span>{performance.geometries} geometries</span>
@@ -514,7 +525,7 @@ export default function Studio3DPage() {
             <span className="eyebrow">ANNOTATIONS</span>
             <h2>Explore features</h2>
             {modelUrl ? <p>Demo annotations apply only to the original sample geometry. Imported models are shown without inferred labels.</p> : <div className="studio-annotation-list">
-              {annotations.map((item) => <button key={item.id} className={`studio-annotation ${selectedAnnotation === item.id ? "studio-annotation-active" : ""}`} onClick={() => setSelectedAnnotation(item.id)}><span>{item.id}</span><strong>{item.title}</strong><Icon name="chevron" size={15} /></button>)}
+              {annotations.map((item) => <button key={item.id} className={`studio-annotation ${selectedAnnotation === item.id ? "studio-annotation-active" : ""}`} onClick={() => setSelectedAnnotation(item.id)} aria-pressed={selectedAnnotation === item.id}><span aria-hidden="true">{item.id}</span><strong>{item.title}</strong><Icon name="chevron" size={15} /></button>)}
             </div>}
             {!modelUrl && <div className="studio-annotation-detail"><strong>{activeAnnotation.title}</strong><p>{activeAnnotation.detail}</p></div>}
           </section>
@@ -522,9 +533,9 @@ export default function Studio3DPage() {
           <section className="studio-panel-section studio-provenance">
             <span className="eyebrow">PROVENANCE & RIGHTS</span>
             <h2>Asset information</h2>
-            <label>Model name<input value={modelName} onChange={(event) => setModelName(event.target.value)} /></label>
-            <label>Source / creator<input value={sourceNote} onChange={(event) => setSourceNote(event.target.value)} /></label>
-            <label>Licence / permission<input value={licenceNote} onChange={(event) => setLicenceNote(event.target.value)} /></label>
+            <label htmlFor="studio-model-name">Model name<input id="studio-model-name" value={modelName} onChange={(event) => setModelName(event.target.value)} /></label>
+            <label htmlFor="studio-source-note">Source / creator<input id="studio-source-note" value={sourceNote} onChange={(event) => setSourceNote(event.target.value)} /></label>
+            <label htmlFor="studio-licence-note">Licence / permission<input id="studio-licence-note" value={licenceNote} onChange={(event) => setLicenceNote(event.target.value)} /></label>
             <p className="studio-rights-note">Metadata is a local session note, not independent rights verification. Confirm the creator, licence, attribution and redistribution terms before publishing or sharing an asset.</p>
           </section>
         </aside>
@@ -534,7 +545,7 @@ export default function Studio3DPage() {
         <article className="studio-info-card"><span className="eyebrow">CONTROLS</span><h2>Navigate the model</h2><ul><li><strong>Orbit:</strong> drag with the primary pointer.</li><li><strong>Zoom:</strong> use the mouse wheel or trackpad gesture.</li><li><strong>Pan:</strong> right-drag or use the supported touch gesture.</li><li><strong>Reset:</strong> restore the default camera position at any time.</li></ul></article>
         <article className="studio-info-card"><span className="eyebrow">MODEL GOVERNANCE</span><h2>Responsible asset handling</h2><ul><li>Use only assets you are authorised to view and process.</li><li>Do not assume publicly accessible models are openly licensed.</li><li>Keep source, creator, licence and attribution details with every published model.</li><li>Imported assets are processed locally and are not saved to the repository.</li></ul></article>
       </section>
-      <p className="studio-accessibility-note">If WebGL is unavailable or a model cannot be rendered, use the model information and annotation text as the accessible learning alternative.</p>
+      <p className="studio-accessibility-note">Accessibility: keyboard-focusable viewport, labelled controls, selectable text annotations and a text-based learning alternative are provided. Reduced-motion preferences disable inertial camera damping. If WebGL is unavailable or a model cannot be rendered, use the model information and annotation text.</p>
     </div>
   );
 }

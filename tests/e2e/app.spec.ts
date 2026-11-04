@@ -207,7 +207,7 @@ test("3D Studio keeps the demonstration scene available after a rejected import"
 
 test("3D Studio annotation and viewport controls remain keyboard-operable", async ({ page }) => {
   await page.goto("/studio-3d");
-  const firstAnnotation = page.getByRole("button", { name:"01 Primary structure" });
+  const firstAnnotation = page.getByRole("button", { name:"Primary structure" });
   await expect(firstAnnotation).toBeVisible();
   await firstAnnotation.focus();
   await page.keyboard.press("Enter");
@@ -303,9 +303,39 @@ test("3D Studio reports WebGL context loss and recovery", async ({ page }) => {
 });
 
 
+
+test("3D Studio exposes an accessible, keyboard-focusable viewport and labelled metadata fields", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const viewport = page.locator("canvas[role='application']");
+  await expect(viewport).toHaveAttribute("tabindex", "0");
+  await expect(viewport).toHaveAttribute("aria-label", /Interactive 3D model viewport/);
+  await expect(viewport).toHaveAttribute("aria-describedby", "studio-viewport-instructions");
+  await expect(page.getByLabel("Model name")).toBeVisible();
+  await expect(page.getByLabel("Source / creator")).toBeVisible();
+  await expect(page.getByLabel("Licence / permission")).toBeVisible();
+  await expect(page.getByRole("group", { name: "3D performance monitor" })).toBeVisible();
+});
+
+test("3D Studio annotation selection exposes its pressed state", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const primary = page.getByRole("button", { name: /Primary structure/ }).last();
+  await expect(primary).toHaveAttribute("aria-pressed", "true");
+  const external = page.getByRole("button", { name: /External module/ }).last();
+  await external.click();
+  await expect(external).toHaveAttribute("aria-pressed", "true");
+  await expect(primary).toHaveAttribute("aria-pressed", "false");
+});
+
+test("3D Studio respects the reduced-motion preference", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/studio-3d");
+  await expect(page.locator("canvas[role='application']")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Reset 3D viewport camera" })).toBeVisible();
+});
+
 test("3D Studio exposes live rendering telemetry and adaptive quality", async ({ page }) => {
   await page.goto("/studio-3d");
-  const monitor = page.getByRole("status", { name: "3D performance monitor" });
+  const monitor = page.getByRole("group", { name: "3D performance monitor" });
   await expect(monitor).toBeVisible();
   await expect(monitor).toContainText("PERFORMANCE MONITOR");
   await expect(monitor).toContainText("Adaptive render scale");
