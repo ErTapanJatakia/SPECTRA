@@ -28,7 +28,7 @@ The project is intended to help security professionals, defence-sector personnel
 
 SPECTRA is being designed as a **supplementary learning and familiarisation resource**. It is not an operational military system, a weapons proficiency programme, or a replacement for authorised professional, national, or United Nations training.
 
-> **Project stage:** Charter established; architecture specification and implementation are pending their respective approval stages. The repository is currently a project foundation and branding/documentation workspace. Planned capabilities described below are not claims of existing functionality.
+> **Project stage:** Project Charter (Prompt 00), Architecture & Product Blueprint (Prompt 01), and Repository Bootstrap & Design System (Prompt 02) are complete. The current release is the application foundation; the equipment knowledge base, 3D Studio, Learning Academy, and peacekeeping content remain planned for their dedicated stages.
 
 ## Mission
 
@@ -166,8 +166,8 @@ The repository includes original concept illustrations prepared for SPECTRA:
 | Stage | Milestone | Current state |
 |---|---|---|
 | 00 | Project charter and governance | Charter established |
-| 01 | Architecture and product blueprint | Awaiting approval |
-| 02 | Repository foundation and design system | Not started |
+| 01 | Architecture and product blueprint | Completed |
+| 02 | Repository foundation and design system | Implemented; CI passed |
 | 03 | Military systems knowledge base | Not started |
 | 04 | Interactive 3D Studio | Not started |
 | 05 | Learning Academy | Not started |
