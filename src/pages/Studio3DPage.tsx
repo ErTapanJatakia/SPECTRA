@@ -368,6 +368,7 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
   useEffect(() => () => contextCleanupRef.current?.(), []);
 
   return (
+    <>
     <Canvas onCreated={handleCreated} camera={{ position: [4.2, 3.1, 5.2], fov: 42 }} dpr={[1, 1.7]}
       shadows gl={{ antialias: true, alpha: true }} fallback={<div className="studio-canvas-error">WebGL is unavailable in this browser. Use the text-based model notes below.</div>}>
       <color attach="background" args={[dark ? "#111b22" : "#e8eef0"]} />
@@ -383,6 +384,7 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
       <OrbitControls key={resetKey} makeDefault enableDamping dampingFactor={0.08} minDistance={2} maxDistance={18} />
     </Canvas>
     {contextLost && <div className="studio-canvas-error" role="alert">The WebGL context was lost. The viewer will resume if the browser restores graphics access; otherwise reload the page or use the text-based model notes.</div>}
+    </>
   );
 }
 
