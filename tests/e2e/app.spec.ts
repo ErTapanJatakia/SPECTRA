@@ -247,7 +247,7 @@ test("3D Studio releases browser object URLs when a local model is unloaded", as
     mimeType: "model/gltf+json",
     buffer: Buffer.from(JSON.stringify(model))
   });
-  await expect(page.getByText("LOCAL MODEL")).toBeVisible();
+  await expect(page.getByText("LOCAL MODEL", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Unload local model" }).click();
   await expect(page.getByText("DEMONSTRATION SCENE")).toBeVisible();
   await expect.poll(async () => page.evaluate(() => {
@@ -285,7 +285,7 @@ test("3D Studio ignores stale validation results after a newer model is selected
     mimeType: "model/gltf+json",
     buffer: Buffer.from(JSON.stringify(model))
   });
-  await expect(page.getByText("LOCAL MODEL")).toBeVisible();
+  await expect(page.getByText("LOCAL MODEL", { exact: true })).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Unload local model" })).toBeVisible();
 });
