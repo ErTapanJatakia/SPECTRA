@@ -454,15 +454,33 @@ test("3D Studio hierarchy supports accessible expand and collapse controls", asy
 
 test("3D Studio camera presets, world-space inspection and point distance measurements work", async ({ page }) => {
   await page.goto("/studio-3d");
+  // Use real, embedded triangle geometry so Drei's Center helper has finite
+  // bounds while the hierarchy inspector exercises transformed child nodes.
+  const positions = Buffer.from(new Float32Array([
+    0, 0, 0,
+    1, 0, 0,
+    0, 1, 0
+  ]).buffer);
   const model = {
     asset: { version: "2.0" },
     scene: 0,
     scenes: [{ nodes: [0] }],
     nodes: [
       { name: "Assembly", translation: [2, 0, 0], children: [1, 2] },
-      { name: "Reference A", translation: [1, 2, 3] },
-      { name: "Reference B", translation: [5, 2, 3] }
-    ]
+      { name: "Reference A", translation: [1, 2, 3], mesh: 0 },
+      { name: "Reference B", translation: [5, 2, 3], mesh: 0 }
+    ],
+    meshes: [{ primitives: [{ attributes: { POSITION: 0 } }] }],
+    accessors: [{
+      bufferView: 0,
+      componentType: 5126,
+      count: 3,
+      type: "VEC3",
+      min: [0, 0, 0],
+      max: [1, 1, 0]
+    }],
+    bufferViews: [{ buffer: 0, byteOffset: 0, byteLength: positions.length }],
+    buffers: [{ byteLength: positions.length, uri: `data:application/octet-stream;base64,${positions.toString("base64")}` }]
   };
   await page.locator("#studio-model-file").setInputFiles({
     name: "spatial-analysis.gltf",
