@@ -75,3 +75,28 @@ test("3D Studio rejects an invalid local model before rendering", async ({ page 
   });
   await expect(page.getByRole("alert")).toContainText("GLB header is invalid");
 });
+
+test("3D Studio rejects models that exceed the geometry complexity budget", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const document = { asset:{ version:"2.0" }, nodes:Array.from({ length:2501 }, () => ({})) };
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"too-many-nodes.gltf", mimeType:"model/gltf+json", buffer:Buffer.from(JSON.stringify(document))
+  });
+  await expect(page.getByRole("alert")).toContainText("too many nodes");
+});
+
+test("3D Studio rejects textures with excessive pixel dimensions", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const pngHeader = Buffer.alloc(24);
+  Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]).copy(pngHeader,0);
+  pngHeader.writeUInt32BE(8192,16);
+  pngHeader.writeUInt32BE(1,20);
+  const document = {
+    asset:{ version:"2.0" },
+    images:[{ uri:`data:image/png;base64,${pngHeader.toString("base64")}` }]
+  };
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"oversized-texture.gltf", mimeType:"model/gltf+json", buffer:Buffer.from(JSON.stringify(document))
+  });
+  await expect(page.getByRole("alert")).toContainText("4,096 pixels per side");
+});
