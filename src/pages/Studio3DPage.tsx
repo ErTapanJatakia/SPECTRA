@@ -1,11 +1,12 @@
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ErrorInfo, ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
 import { Center, Html, OrbitControls, useGLTF } from "@react-three/drei";
 import PageHeading from "../components/PageHeading";
 import Icon from "../components/Icon";
+import { inspectModelHierarchy, type ModelNodeSnapshot } from "../lib/modelInspection";
 import "./studio3d.css";
 
 const MAX_MODEL_BYTES = 25 * 1024 * 1024;
@@ -237,6 +238,7 @@ async function validateModelFile(file: File, extension: string): Promise<void> {
   }
 }
 type Annotation = { id: string; title: string; detail: string; position: [number, number, number] };
+type ModelAnnotation = { id: string; nodeId: string; title: string; detail: string };
 
 const annotations: Annotation[] = [
   { id: "01", title: "Primary structure", detail: "A visual reference point for understanding the model's overall form.", position: [0, 1.05, 0] },
@@ -334,11 +336,35 @@ function disposeModelResources(root: THREE.Object3D): void {
   textures.forEach((texture) => texture.dispose());
 }
 
-function ImportedModel({ url }: { url: string }) {
+function SelectionOutline({ root, selectedNodeId }: { root: THREE.Object3D; selectedNodeId: string }) {
+  const { scene } = useThree();
+  useEffect(() => {
+    if (!selectedNodeId) return;
+    const target = selectedNodeId.split(".").slice(1).reduce<THREE.Object3D | undefined>(
+      (parent, index) => parent?.children[Number(index)], root
+    );
+    if (!target) return;
+    const helper = new THREE.BoxHelper(target, "#72b8a4");
+    scene.add(helper);
+    return () => {
+      scene.remove(helper);
+      helper.geometry.dispose();
+      (helper.material as THREE.Material).dispose();
+    };
+  }, [root, scene, selectedNodeId]);
+  return null;
+}
+
+function ImportedModel({ url, selectedNodeId, onHierarchyChange }: {
+  url: string; selectedNodeId: string; onHierarchyChange: (nodes: ModelNodeSnapshot[]) => void;
+}) {
   const { scene } = useGLTF(url);
   const cloned = useMemo(() => cloneModelResources(scene), [scene]);
+  useEffect(() => {
+    onHierarchyChange(inspectModelHierarchy(cloned));
+  }, [cloned, onHierarchyChange]);
   useEffect(() => () => disposeModelResources(cloned), [cloned]);
-  return <primitive object={cloned} dispose={null} />;
+  return <><primitive object={cloned} dispose={null} /><SelectionOutline root={cloned} selectedNodeId={selectedNodeId} /></>;
 }
 
 type PerformanceSample = { fps: number; geometries: number; textures: number; drawCalls: number };
@@ -362,10 +388,11 @@ function PerformanceSampler({ onSample }: { onSample: (sample: PerformanceSample
   return null;
 }
 
-function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark, dpr, reducedMotion, onPerformanceSample }: {
+function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark, dpr, reducedMotion, onPerformanceSample, selectedNodeId, onHierarchyChange }: {
   modelUrl: string | null; showAnnotations: boolean; selectedAnnotation: string;
   onSelect: (id: string) => void; resetKey: number; dark: boolean; dpr: number; reducedMotion: boolean;
-  onPerformanceSample: (sample: PerformanceSample) => void;
+  onPerformanceSample: (sample: PerformanceSample) => void; selectedNodeId: string;
+  onHierarchyChange: (nodes: ModelNodeSnapshot[]) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextCleanupRef = useRef<(() => void) | null>(null);
@@ -404,7 +431,7 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
       <gridHelper args={[12, 24, dark ? "#334b56" : "#c1d0d4", dark ? "#263943" : "#d2dcdf"]} position={[0, -0.8, 0]} />
       <Suspense fallback={<Html center><div className="studio-loader">Loading model…</div></Html>}>
         <ModelErrorBoundary>
-          {modelUrl ? <Center><ImportedModel url={modelUrl} /></Center> : <DemoModel showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation} onSelect={onSelect} />}
+          {modelUrl ? <Center><ImportedModel url={modelUrl} selectedNodeId={selectedNodeId} onHierarchyChange={onHierarchyChange} /></Center> : <DemoModel showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation} onSelect={onSelect} />}
         </ModelErrorBoundary>
       </Suspense>
       <PerformanceSampler onSample={onPerformanceSample} />
@@ -418,17 +445,50 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
 export default function Studio3DPage() {
   const [modelUrl, setModelUrl] = useState<string | null>(null);
   const importRequestRef = useRef(0);
+  const annotationSequenceRef = useRef(0);
   const [modelName, setModelName] = useState("SPECTRA illustrative reference model");
   const [sourceNote, setSourceNote] = useState("Original geometric demonstration asset");
   const [licenceNote, setLicenceNote] = useState("SPECTRA demo geometry — original");
   const [fileError, setFileError] = useState("");
   const [selectedAnnotation, setSelectedAnnotation] = useState("01");
+  const [modelNodes, setModelNodes] = useState<ModelNodeSnapshot[]>([]);
+  const [selectedNodeId, setSelectedNodeId] = useState("");
+  const [nodeSearch, setNodeSearch] = useState("");
+  const [collapsedNodeIds, setCollapsedNodeIds] = useState<string[]>([]);
+  const [modelAnnotations, setModelAnnotations] = useState<ModelAnnotation[]>([]);
+  const [annotationTitle, setAnnotationTitle] = useState("");
+  const [annotationDetail, setAnnotationDetail] = useState("");
+  const [annotationError, setAnnotationError] = useState("");
   const [showAnnotations, setShowAnnotations] = useState(true);
   const [resetKey, setResetKey] = useState(0);
   const [dark, setDark] = useState(true);
   const [performance, setPerformance] = useState<PerformanceSample>({ fps: 0, geometries: 0, textures: 0, drawCalls: 0 });
   const [renderDpr, setRenderDpr] = useState(1.25);
   const [reducedMotion, setReducedMotion] = useState(false);
+
+  const handleHierarchyChange = useCallback((nodes: ModelNodeSnapshot[]) => {
+    setModelNodes(nodes);
+    setSelectedNodeId((current) => nodes.some((node) => node.id === current) ? current : (nodes[0]?.id ?? ""));
+  }, []);
+
+  const visibleModelNodes = useMemo(() => {
+    const query = nodeSearch.trim().toLowerCase();
+    const matches = (node: ModelNodeSnapshot) => !query ||
+      `${node.name} ${node.type} ${node.materials?.join(" ") ?? ""}`.toLowerCase().includes(query);
+    const hasMatchingDescendant = (id: string): boolean =>
+      modelNodes.some((candidate) => candidate.parentId === id && (matches(candidate) || hasMatchingDescendant(candidate.id)));
+    return modelNodes.filter((node) => {
+      if (query && !matches(node) && !hasMatchingDescendant(node.id)) return false;
+      if (query) return true;
+      let parentId = node.parentId;
+      while (parentId) {
+        if (collapsedNodeIds.includes(parentId)) return false;
+        parentId = modelNodes.find((candidate) => candidate.id === parentId)?.parentId ?? null;
+      }
+      return true;
+    }).slice(0, 200);
+  }, [modelNodes, nodeSearch, collapsedNodeIds]);
+  const selectedModelNode = modelNodes.find((node) => node.id === selectedNodeId);
 
   const handlePerformanceSample = useCallback((sample: PerformanceSample) => {
     setPerformance(sample);
@@ -448,6 +508,7 @@ export default function Studio3DPage() {
   }, []);
 
   useEffect(() => () => { if (modelUrl) { useGLTF.clear(modelUrl); URL.revokeObjectURL(modelUrl); } }, [modelUrl]);
+  useEffect(() => { if (!modelUrl) { setModelNodes([]); setSelectedNodeId(""); setNodeSearch(""); setCollapsedNodeIds([]); setModelAnnotations([]); setAnnotationTitle(""); setAnnotationDetail(""); setAnnotationError(""); } }, [modelUrl]);
 
   async function handleFile(file?: File) {
     if (!file) return;
@@ -472,6 +533,22 @@ export default function Studio3DPage() {
     }
   }
 
+  const addModelAnnotation = () => {
+    const title = annotationTitle.trim();
+    const detail = annotationDetail.trim();
+    if (!selectedModelNode) { setAnnotationError("Select a scene object before adding an annotation."); return; }
+    if (!title || !detail) { setAnnotationError("Enter both an annotation title and explanation."); return; }
+    if (title.length > 80 || detail.length > 400) { setAnnotationError("Titles are limited to 80 characters and explanations to 400 characters."); return; }
+    setModelAnnotations((current) => [...current, {
+      id: `annotation-${++annotationSequenceRef.current}`,
+      nodeId: selectedModelNode.id,
+      title,
+      detail
+    }]);
+    setAnnotationTitle("");
+    setAnnotationDetail("");
+    setAnnotationError("");
+  };
   const activeAnnotation = annotations.find((item) => item.id === selectedAnnotation) ?? annotations[0];
 
   return (
@@ -496,7 +573,8 @@ export default function Studio3DPage() {
           <div className="studio-canvas-wrap">
             <p id="studio-viewport-instructions" className="studio-sr-only">The 3D viewport is keyboard focusable. Use the Reset view button to restore the default view. Annotation controls are available in the Explore features panel. The viewport also supports pointer and touch navigation.</p>
             <Scene modelUrl={modelUrl} showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation}
-              onSelect={setSelectedAnnotation} resetKey={resetKey} dark={dark} dpr={renderDpr} reducedMotion={reducedMotion} onPerformanceSample={handlePerformanceSample} />
+              onSelect={setSelectedAnnotation} resetKey={resetKey} dark={dark} dpr={renderDpr} reducedMotion={reducedMotion} onPerformanceSample={handlePerformanceSample}
+              selectedNodeId={selectedNodeId} onHierarchyChange={handleHierarchyChange} />
             <div className="studio-viewer-hint"><span>DRAG · ORBIT</span><span>SCROLL · ZOOM</span><span>RIGHT-DRAG · PAN</span></div>
           </div>
           <div className="studio-viewer-caption"><span><i className="studio-status-dot" /> Browser-local rendering</span><span>No model is uploaded to SPECTRA servers</span></div>
@@ -521,10 +599,66 @@ export default function Studio3DPage() {
             {modelUrl && <button className="studio-clear-button" onClick={() => { importRequestRef.current += 1; setModelUrl(null); setModelName("SPECTRA illustrative reference model"); setSourceNote("Original geometric demonstration asset"); setLicenceNote("SPECTRA demo geometry — original"); }}>Unload local model</button>}
           </section>
 
+          {modelUrl && <section className="studio-panel-section studio-inspector" aria-label="Model hierarchy inspector">
+            <span className="eyebrow">MODEL INSPECTOR</span>
+            <h2>Scene hierarchy</h2>
+            <p>Read-only view of the loaded Three.js scene. Node names are labels, not trusted metadata.</p>
+            <label htmlFor="studio-node-search">Search objects<input id="studio-node-search" type="search" value={nodeSearch} onChange={(event) => setNodeSearch(event.target.value)} placeholder="Name, type or material" /></label>
+            <div className="studio-node-tree" role="group" aria-label="Model objects">
+              {visibleModelNodes.map((node) => {
+                const hasChildren = modelNodes.some((candidate) => candidate.parentId === node.id);
+                const expanded = !collapsedNodeIds.includes(node.id);
+                return <div className="studio-node-row" key={node.id} style={{ paddingLeft: `${(node.id.split(".").length - 1) * 12}px` }}>
+                  {hasChildren ? <button type="button" className="studio-node-toggle" aria-label={`${expanded ? "Collapse" : "Expand"} ${node.name}`}
+                    aria-expanded={expanded} onClick={() => setCollapsedNodeIds((current) =>
+                      expanded ? [...current, node.id] : current.filter((id) => id !== node.id)
+                    )}>{expanded ? "▾" : "▸"}</button> : <span className="studio-node-toggle-placeholder" />}
+                  <button type="button" className={`studio-node-item ${selectedNodeId === node.id ? "studio-node-active" : ""}`}
+                    onClick={() => setSelectedNodeId(node.id)} aria-pressed={selectedNodeId === node.id}>
+                    <span>{node.isMesh ? "◈" : "◇"}</span><strong>{node.name}</strong><small>{node.type}</small>
+                  </button>
+                </div>;
+              })}
+              {visibleModelNodes.length === 0 && <p className="studio-inspector-empty">No matching scene objects.</p>}
+            </div>
+            {modelNodes.length > 200 && <p className="studio-inspector-empty">Showing up to 200 matching objects of {modelNodes.length.toLocaleString("en-US")}.</p>}
+            {selectedModelNode && <div className="studio-node-properties" aria-live="polite">
+              <strong>Selected object · {selectedModelNode.type}</strong>
+              <span>Name: {selectedModelNode.name}</span>
+              <span>Position: {selectedModelNode.position.map((value) => value.toFixed(3)).join(", ")}</span>
+              <span>Rotation: {selectedModelNode.rotation.map((value) => value.toFixed(3)).join(", ")}</span>
+              <span>Scale: {selectedModelNode.scale.map((value) => value.toFixed(3)).join(", ")}</span>
+              <span>Visible: {selectedModelNode.visible ? "Yes" : "No"}</span>
+              {selectedModelNode.isMesh && <>
+                <span>Geometry: {selectedModelNode.geometryType}</span>
+                <span>Vertices: {selectedModelNode.vertexCount?.toLocaleString("en-US")}</span>
+                <span>Indices: {selectedModelNode.indexCount?.toLocaleString("en-US")}</span>
+                <span>Materials: {selectedModelNode.materials?.join(", ") || "None"}</span>
+              </>}
+            </div>}
+          </section>}
           <section className="studio-panel-section">
             <span className="eyebrow">ANNOTATIONS</span>
             <h2>Explore features</h2>
-            {modelUrl ? <p>Demo annotations apply only to the original sample geometry. Imported models are shown without inferred labels.</p> : <div className="studio-annotation-list">
+            {modelUrl ? <>
+              <p>Annotations are authored by you, attached to the selected object and held only in this browser session. No labels are inferred from imported model metadata.</p>
+              {selectedModelNode && <div className="studio-annotation-form">
+                <span className="studio-inspector-empty">Attach to: {selectedModelNode.name}</span>
+                <label htmlFor="studio-annotation-title">Annotation title<input id="studio-annotation-title" value={annotationTitle} maxLength={80} onChange={(event) => setAnnotationTitle(event.target.value)} placeholder="e.g. Housing assembly" /></label>
+                <label htmlFor="studio-annotation-detail">Educational explanation<textarea id="studio-annotation-detail" value={annotationDetail} maxLength={400} rows={3} onChange={(event) => setAnnotationDetail(event.target.value)} placeholder="Describe this component for learning purposes." /></label>
+                <button className="studio-tool-button" type="button" onClick={addModelAnnotation}>Add annotation</button>
+                {annotationError && <p className="studio-error" role="alert">{annotationError}</p>}
+              </div>}
+              {modelAnnotations.length > 0 && <div className="studio-annotation-list">
+                {modelAnnotations.map((item) => <article className="studio-model-annotation" key={item.id}>
+                  <button className="studio-annotation" type="button" onClick={() => setSelectedNodeId(item.nodeId)} aria-label={`Select annotated object: ${item.title}`}>
+                    <span aria-hidden="true">•</span><strong>{item.title}</strong><Icon name="chevron" size={15} />
+                  </button>
+                  <p>{item.detail}</p>
+                  <button className="studio-clear-button" type="button" onClick={() => setModelAnnotations((current) => current.filter((annotation) => annotation.id !== item.id))}>Remove annotation</button>
+                </article>)}
+              </div>}
+            </> : <div className="studio-annotation-list">
               {annotations.map((item) => <button key={item.id} className={`studio-annotation ${selectedAnnotation === item.id ? "studio-annotation-active" : ""}`} onClick={() => setSelectedAnnotation(item.id)} aria-pressed={selectedAnnotation === item.id}><span aria-hidden="true">{item.id}</span><strong>{item.title}</strong><Icon name="chevron" size={15} /></button>)}
             </div>}
             {!modelUrl && <div className="studio-annotation-detail"><strong>{activeAnnotation.title}</strong><p>{activeAnnotation.detail}</p></div>}
@@ -534,9 +668,9 @@ export default function Studio3DPage() {
             <span className="eyebrow">PROVENANCE & RIGHTS</span>
             <h2>Asset information</h2>
             <label htmlFor="studio-model-name">Model name<input id="studio-model-name" value={modelName} onChange={(event) => setModelName(event.target.value)} /></label>
-            <label htmlFor="studio-source-note">Source / creator<input id="studio-source-note" value={sourceNote} onChange={(event) => setSourceNote(event.target.value)} /></label>
-            <label htmlFor="studio-licence-note">Licence / permission<input id="studio-licence-note" value={licenceNote} onChange={(event) => setLicenceNote(event.target.value)} /></label>
-            <p className="studio-rights-note">Metadata is a local session note, not independent rights verification. Confirm the creator, licence, attribution and redistribution terms before publishing or sharing an asset.</p>
+            <label htmlFor="studio-source-note">User-supplied source / creator note<input id="studio-source-note" value={sourceNote} onChange={(event) => setSourceNote(event.target.value)} /></label>
+            <label htmlFor="studio-licence-note">User-supplied licence / permission note<input id="studio-licence-note" value={licenceNote} onChange={(event) => setLicenceNote(event.target.value)} /></label>
+            <p className="studio-rights-note">Origin: {modelUrl ? "User-selected local file" : "SPECTRA demonstration geometry"}. These fields are user-supplied session notes, not verified model metadata or rights evidence. Embedded creator/licence claims are not trusted. Confirm the creator, licence, attribution and redistribution terms independently before publishing or sharing an asset.</p>
           </section>
         </aside>
       </section>
