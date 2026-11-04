@@ -406,3 +406,24 @@ test("3D Studio exposes a searchable hierarchy and read-only object properties f
   await page.getByLabel("Search objects").fill("Group");
   await expect(rootNode).toBeVisible();
 });
+
+
+test("3D Studio keeps educational annotations session-local and renders user text safely", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const model = { asset: { version: "2.0" }, scene: 0, scenes: [{ nodes: [] }] };
+  await page.locator("#studio-model-file").setInputFiles({
+    name: "annotation-model.gltf",
+    mimeType: "model/gltf+json",
+    buffer: Buffer.from(JSON.stringify(model))
+  });
+  await expect(page.getByRole("heading", { name: "Scene hierarchy" })).toBeVisible();
+  await page.getByLabel("Annotation title").fill("<img src=x onerror=alert(1)>");
+  await page.getByLabel("Educational explanation").fill("User-authored educational note.");
+  await page.getByRole("button", { name: "Add annotation" }).click();
+  await expect(page.getByText("<img src=x onerror=alert(1)>", { exact: true })).toBeVisible();
+  await expect(page.locator(".studio-model-annotation img")).toHaveCount(0);
+  await expect(page.getByText("User-authored educational note.")).toBeVisible();
+  await page.getByRole("button", { name: "Unload local model" }).click();
+  await expect(page.getByText("<img src=x onerror=alert(1)>", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("DEMONSTRATION SCENE")).toBeVisible();
+});
