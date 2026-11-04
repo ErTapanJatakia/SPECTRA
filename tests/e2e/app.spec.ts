@@ -213,7 +213,7 @@ test("3D Studio annotation and viewport controls remain keyboard-operable", asyn
   await page.keyboard.press("Enter");
   await expect(page.getByText("A visual reference point for understanding the model's overall form.")).toBeVisible();
   await page.getByRole("button", { name:/Hide labels/ }).click();
-  await expect(page.getByRole("button", { name:"01 Primary structure" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name:"Show annotation: Primary structure" })).toHaveCount(0);
   await page.getByRole("button", { name:/Show labels/ }).click();
-  await expect(page.getByRole("button", { name:"01 Primary structure" })).toBeVisible();
+  await expect(page.getByRole("button", { name:"Show annotation: Primary structure" })).toBeVisible();
 });
