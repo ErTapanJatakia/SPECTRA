@@ -450,3 +450,33 @@ test("3D Studio hierarchy supports accessible expand and collapse controls", asy
   await page.getByRole("button", { name: "Expand Parent" }).click();
   await expect(page.getByRole("button", { name: /Child/ })).toBeVisible();
 });
+
+
+test("3D Studio camera presets, world-space inspection and point distance measurements work", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const model = {
+    asset: { version: "2.0" },
+    scene: 0,
+    scenes: [{ nodes: [0] }],
+    nodes: [
+      { name: "Assembly", translation: [2, 0, 0], children: [1, 2] },
+      { name: "Reference A", translation: [1, 2, 3] },
+      { name: "Reference B", translation: [5, 2, 3] }
+    ]
+  };
+  await page.locator("#studio-model-file").setInputFiles({
+    name: "spatial-analysis.gltf",
+    mimeType: "model/gltf+json",
+    buffer: Buffer.from(JSON.stringify(model))
+  });
+  await expect(page.getByRole("button", { name: "Front view" })).toBeVisible();
+  await page.getByRole("button", { name: "Top view" }).click();
+  await page.getByRole("button", { name: "Isometric view" }).click();
+  await page.getByRole("button", { name: /Reference A/ }).click();
+  await expect(page.getByText(/World position: 3\\.000, 2\\.000, 3\\.000/)).toBeVisible();
+  await page.getByRole("button", { name: "Set measurement start" }).click();
+  await page.getByRole("button", { name: /Reference B/ }).click();
+  await expect(page.getByText(/Distance from Reference A: 4\\.000 m/)).toBeVisible();
+  await page.getByRole("button", { name: "Focus selected" }).click();
+  await page.getByRole("button", { name: "Fit scene" }).click();
+});
