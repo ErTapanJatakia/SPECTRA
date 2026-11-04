@@ -1,0 +1,8 @@
+{
+  "id":"/","name":"SPECTRA — Global Defence Systems & Peace Operations Learning Atlas",
+  "short_name":"SPECTRA",
+  "description":"An independent educational and research atlas for defence systems and peace operations.",
+  "lang":"en","start_url":"/","scope":"/","display":"standalone",
+  "background_color":"#0b1420","theme_color":"#0b1420",
+  "icons":[{"src":"/favicon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]
+}

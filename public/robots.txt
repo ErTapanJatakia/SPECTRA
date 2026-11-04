@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+# SPECTRA is an independent educational and research project.
