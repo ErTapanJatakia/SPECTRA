@@ -10,6 +10,37 @@ import "./studio3d.css";
 const MAX_MODEL_BYTES = 25 * 1024 * 1024;
 const ACCEPTED_EXTENSIONS = [".glb", ".gltf"];
 
+async function validateModelFile(file: File, extension: string): Promise<void> {
+  let document: Record<string, unknown>;
+  if (extension === ".glb") {
+    const bytes = await file.arrayBuffer();
+    const view = new DataView(bytes);
+    if (bytes.byteLength < 20 || view.getUint32(0, true) !== 0x46546c67 || view.getUint32(4, true) !== 2 || view.getUint32(8, true) !== bytes.byteLength) {
+      throw new Error("The GLB header is invalid or the file is not a glTF 2.0 binary.");
+    }
+    const jsonLength = view.getUint32(12, true);
+    const jsonType = view.getUint32(16, true);
+    if (jsonType !== 0x4e4f534a || jsonLength > bytes.byteLength - 20) throw new Error("The GLB JSON chunk is invalid.");
+    document = JSON.parse(new TextDecoder().decode(new Uint8Array(bytes, 20, jsonLength)).replace(/\\u0000+$/g, "").trim()) as Record<string, unknown>;
+  } else {
+    document = JSON.parse(await file.text()) as Record<string, unknown>;
+  }
+  const asset = document.asset as { version?: string } | undefined;
+  if (asset?.version !== "2.0") throw new Error("Only glTF 2.0 models are supported.");
+  for (const collectionName of ["buffers", "images"]) {
+    const collection = document[collectionName];
+    if (Array.isArray(collection)) {
+      for (const entry of collection) {
+        if (entry && typeof entry === "object" && "uri" in entry && typeof entry.uri === "string" && !entry.uri.startsWith("data:")) {
+          throw new Error("External model resources are blocked. Use a self-contained GLB or a glTF file with embedded data URIs.");
+        }
+      }
+    }
+  }
+  if (Array.isArray(document.nodes) && document.nodes.length > 10000) throw new Error("The model contains too many scene nodes (maximum 10,000).");
+  if (Array.isArray(document.meshes) && document.meshes.length > 2000) throw new Error("The model contains too many meshes (maximum 2,000).");
+}
+
 type Annotation = { id: string; title: string; detail: string; position: [number, number, number] };
 
 const annotations: Annotation[] = [
@@ -149,8 +180,8 @@ export default function Studio3DPage() {
           <section className="studio-panel-section">
             <span className="eyebrow">MODEL LIBRARY</span>
             <h2>Load a model</h2>
-            <p>Choose a GLB or glTF asset from your device. The file remains in this browser session and is not transmitted.</p>
-            <label className="studio-upload" htmlFor="studio-model-file"><Icon name="file" size={18} /><strong>Select 3D model</strong><span>GLB / glTF · Maximum 25 MB</span></label>
+            <p>Choose a self-contained GLB or glTF 2.0 asset. External model resources are blocked; the file remains in this browser session.</p>
+            <label className="studio-upload" htmlFor="studio-model-file"><Icon name="file" size={18} /><strong>Select 3D model</strong><span>GLB / glTF 2.0 · 25 MB maximum · Embedded resources only</span></label>
             <input id="studio-model-file" className="studio-file-input" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" onChange={(event) => handleFile(event.target.files?.[0])} />
             {fileError && <p className="studio-error" role="alert">{fileError}</p>}
             {modelUrl && <button className="studio-clear-button" onClick={() => { URL.revokeObjectURL(modelUrl); setModelUrl(null); setModelName("SPECTRA illustrative reference model"); setSourceNote("Original geometric demonstration asset"); setLicenceNote("SPECTRA demo geometry — original"); }}>Unload local model</button>}
