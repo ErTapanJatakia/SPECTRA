@@ -238,6 +238,7 @@ async function validateModelFile(file: File, extension: string): Promise<void> {
   }
 }
 type Annotation = { id: string; title: string; detail: string; position: [number, number, number] };
+type ModelAnnotation = { id: string; nodeId: string; title: string; detail: string };
 
 const annotations: Annotation[] = [
   { id: "01", title: "Primary structure", detail: "A visual reference point for understanding the model's overall form.", position: [0, 1.05, 0] },
@@ -452,6 +453,10 @@ export default function Studio3DPage() {
   const [modelNodes, setModelNodes] = useState<ModelNodeSnapshot[]>([]);
   const [selectedNodeId, setSelectedNodeId] = useState("");
   const [nodeSearch, setNodeSearch] = useState("");
+  const [modelAnnotations, setModelAnnotations] = useState<ModelAnnotation[]>([]);
+  const [annotationTitle, setAnnotationTitle] = useState("");
+  const [annotationDetail, setAnnotationDetail] = useState("");
+  const [annotationError, setAnnotationError] = useState("");
   const [showAnnotations, setShowAnnotations] = useState(true);
   const [resetKey, setResetKey] = useState(0);
   const [dark, setDark] = useState(true);
@@ -488,7 +493,7 @@ export default function Studio3DPage() {
   }, []);
 
   useEffect(() => () => { if (modelUrl) { useGLTF.clear(modelUrl); URL.revokeObjectURL(modelUrl); } }, [modelUrl]);
-  useEffect(() => { if (!modelUrl) { setModelNodes([]); setSelectedNodeId(""); setNodeSearch(""); } }, [modelUrl]);
+  useEffect(() => { if (!modelUrl) { setModelNodes([]); setSelectedNodeId(""); setNodeSearch(""); setModelAnnotations([]); setAnnotationTitle(""); setAnnotationDetail(""); setAnnotationError(""); } }, [modelUrl]);
 
   async function handleFile(file?: File) {
     if (!file) return;
@@ -513,6 +518,22 @@ export default function Studio3DPage() {
     }
   }
 
+  const addModelAnnotation = () => {
+    const title = annotationTitle.trim();
+    const detail = annotationDetail.trim();
+    if (!selectedModelNode) { setAnnotationError("Select a scene object before adding an annotation."); return; }
+    if (!title || !detail) { setAnnotationError("Enter both an annotation title and explanation."); return; }
+    if (title.length > 80 || detail.length > 400) { setAnnotationError("Titles are limited to 80 characters and explanations to 400 characters."); return; }
+    setModelAnnotations((current) => [...current, {
+      id: `annotation-${current.length + 1}-${selectedModelNode.id}`,
+      nodeId: selectedModelNode.id,
+      title,
+      detail
+    }]);
+    setAnnotationTitle("");
+    setAnnotationDetail("");
+    setAnnotationError("");
+  };
   const activeAnnotation = annotations.find((item) => item.id === selectedAnnotation) ?? annotations[0];
 
   return (
@@ -596,7 +617,25 @@ export default function Studio3DPage() {
           <section className="studio-panel-section">
             <span className="eyebrow">ANNOTATIONS</span>
             <h2>Explore features</h2>
-            {modelUrl ? <p>Demo annotations apply only to the original sample geometry. Imported models are shown without inferred labels.</p> : <div className="studio-annotation-list">
+            {modelUrl ? <>
+              <p>Annotations are authored by you, attached to the selected object and held only in this browser session. No labels are inferred from imported model metadata.</p>
+              {selectedModelNode && <div className="studio-annotation-form">
+                <span className="studio-inspector-empty">Attach to: {selectedModelNode.name}</span>
+                <label htmlFor="studio-annotation-title">Annotation title<input id="studio-annotation-title" value={annotationTitle} maxLength={80} onChange={(event) => setAnnotationTitle(event.target.value)} placeholder="e.g. Housing assembly" /></label>
+                <label htmlFor="studio-annotation-detail">Educational explanation<textarea id="studio-annotation-detail" value={annotationDetail} maxLength={400} rows={3} onChange={(event) => setAnnotationDetail(event.target.value)} placeholder="Describe this component for learning purposes." /></label>
+                <button className="studio-tool-button" type="button" onClick={addModelAnnotation}>Add annotation</button>
+                {annotationError && <p className="studio-error" role="alert">{annotationError}</p>}
+              </div>}
+              {modelAnnotations.length > 0 && <div className="studio-annotation-list">
+                {modelAnnotations.map((item) => <article className="studio-model-annotation" key={item.id}>
+                  <button className="studio-annotation" type="button" onClick={() => setSelectedNodeId(item.nodeId)} aria-label={`Select annotated object: ${item.title}`}>
+                    <span aria-hidden="true">•</span><strong>{item.title}</strong><Icon name="chevron" size={15} />
+                  </button>
+                  <p>{item.detail}</p>
+                  <button className="studio-clear-button" type="button" onClick={() => setModelAnnotations((current) => current.filter((annotation) => annotation.id !== item.id))}>Remove annotation</button>
+                </article>)}
+              </div>}
+            </> : <div className="studio-annotation-list">
               {annotations.map((item) => <button key={item.id} className={`studio-annotation ${selectedAnnotation === item.id ? "studio-annotation-active" : ""}`} onClick={() => setSelectedAnnotation(item.id)} aria-pressed={selectedAnnotation === item.id}><span aria-hidden="true">{item.id}</span><strong>{item.title}</strong><Icon name="chevron" size={15} /></button>)}
             </div>}
             {!modelUrl && <div className="studio-annotation-detail"><strong>{activeAnnotation.title}</strong><p>{activeAnnotation.detail}</p></div>}
@@ -606,9 +645,9 @@ export default function Studio3DPage() {
             <span className="eyebrow">PROVENANCE & RIGHTS</span>
             <h2>Asset information</h2>
             <label htmlFor="studio-model-name">Model name<input id="studio-model-name" value={modelName} onChange={(event) => setModelName(event.target.value)} /></label>
-            <label htmlFor="studio-source-note">Source / creator<input id="studio-source-note" value={sourceNote} onChange={(event) => setSourceNote(event.target.value)} /></label>
-            <label htmlFor="studio-licence-note">Licence / permission<input id="studio-licence-note" value={licenceNote} onChange={(event) => setLicenceNote(event.target.value)} /></label>
-            <p className="studio-rights-note">Metadata is a local session note, not independent rights verification. Confirm the creator, licence, attribution and redistribution terms before publishing or sharing an asset.</p>
+            <label htmlFor="studio-source-note">User-supplied source / creator note<input id="studio-source-note" value={sourceNote} onChange={(event) => setSourceNote(event.target.value)} /></label>
+            <label htmlFor="studio-licence-note">User-supplied licence / permission note<input id="studio-licence-note" value={licenceNote} onChange={(event) => setLicenceNote(event.target.value)} /></label>
+            <p className="studio-rights-note">Origin: {modelUrl ? "User-selected local file" : "SPECTRA demonstration geometry"}. These fields are user-supplied session notes, not verified model metadata or rights evidence. Embedded creator/licence claims are not trusted. Confirm the creator, licence, attribution and redistribution terms independently before publishing or sharing an asset.</p>
           </section>
         </aside>
       </section>
