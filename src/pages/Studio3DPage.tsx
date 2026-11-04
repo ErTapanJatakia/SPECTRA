@@ -1,5 +1,6 @@
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ErrorInfo, ReactNode } from "react";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
@@ -7,6 +8,7 @@ import { Center, Html, OrbitControls, useGLTF } from "@react-three/drei";
 import PageHeading from "../components/PageHeading";
 import Icon from "../components/Icon";
 import { inspectModelHierarchy, type ModelNodeSnapshot } from "../lib/modelInspection";
+import { cameraPositionForPreset, distanceBetweenPoints, formatDistance, type CameraPreset } from "../lib/spatialAnalysis";
 import "./studio3d.css";
 
 const MAX_MODEL_BYTES = 25 * 1024 * 1024;
@@ -355,7 +357,7 @@ function SelectionOutline({ root, selectedNodeId }: { root: THREE.Object3D; sele
   return null;
 }
 
-function ImportedModel({ url, selectedNodeId, onHierarchyChange }: {
+function ImportedModel({ url, selectedNodeId, onHierarchyChange, cameraCommand }: {
   url: string; selectedNodeId: string; onHierarchyChange: (nodes: ModelNodeSnapshot[]) => void;
 }) {
   const { scene } = useGLTF(url);
@@ -368,6 +370,29 @@ function ImportedModel({ url, selectedNodeId, onHierarchyChange }: {
 }
 
 type PerformanceSample = { fps: number; geometries: number; textures: number; drawCalls: number };
+type ViewCommand = { id: number; preset: CameraPreset | "fit"; target: [number, number, number] };
+
+function ViewportCameraController({ command, controlsRef }: {
+  command: ViewCommand | null;
+  controlsRef: React.RefObject<OrbitControlsImpl | null>;
+}) {
+  const { camera } = useThree();
+  useEffect(() => {
+    if (!command || !controlsRef.current) return;
+    const target = new THREE.Vector3(...command.target);
+    const position = command.preset === "fit"
+      ? [target.x + 4.2, target.y + 3.1, target.z + 5.2] as [number, number, number]
+      : cameraPositionForPreset(command.target, command.preset, 7);
+    camera.position.set(...position);
+    camera.up.set(0, 1, 0);
+    if (command.preset === "top") camera.up.set(0, 0, -1);
+    if (command.preset === "bottom") camera.up.set(0, 0, 1);
+    camera.lookAt(target);
+    controlsRef.current.target.copy(target);
+    controlsRef.current.update();
+  }, [camera, command, controlsRef]);
+  return null;
+}
 
 function PerformanceSampler({ onSample }: { onSample: (sample: PerformanceSample) => void }) {
   const elapsedRef = useRef(0);
@@ -460,7 +485,7 @@ export default function Studio3DPage() {
   const [annotationDetail, setAnnotationDetail] = useState("");
   const [annotationError, setAnnotationError] = useState("");
   const [showAnnotations, setShowAnnotations] = useState(true);
-  const [resetKey, setResetKey] = useState(0);
+  const [resetKey, setResetKey] = useState(0);\n  const [cameraCommand, setCameraCommand] = useState<ViewCommand | null>(null);\n  const cameraCommandSequence = useRef(0);\n  const [measurementStartId, setMeasurementStartId] = useState("");
   const [dark, setDark] = useState(true);
   const [performance, setPerformance] = useState<PerformanceSample>({ fps: 0, geometries: 0, textures: 0, drawCalls: 0 });
   const [renderDpr, setRenderDpr] = useState(1.25);
@@ -488,7 +513,7 @@ export default function Studio3DPage() {
       return true;
     }).slice(0, 200);
   }, [modelNodes, nodeSearch, collapsedNodeIds]);
-  const selectedModelNode = modelNodes.find((node) => node.id === selectedNodeId);
+  const selectedModelNode = modelNodes.find((node) => node.id === selectedNodeId);\n  const measurementStartNode = modelNodes.find((node) => node.id === measurementStartId);\n  const requestCameraView = (preset: CameraPreset | "fit", target: [number, number, number] = [0, 0, 0]) => {\n    setCameraCommand({ id: ++cameraCommandSequence.current, preset, target });\n  };
 
   const handlePerformanceSample = useCallback((sample: PerformanceSample) => {
     setPerformance(sample);
@@ -508,7 +533,7 @@ export default function Studio3DPage() {
   }, []);
 
   useEffect(() => () => { if (modelUrl) { useGLTF.clear(modelUrl); URL.revokeObjectURL(modelUrl); } }, [modelUrl]);
-  useEffect(() => { if (!modelUrl) { setModelNodes([]); setSelectedNodeId(""); setNodeSearch(""); setCollapsedNodeIds([]); setModelAnnotations([]); setAnnotationTitle(""); setAnnotationDetail(""); setAnnotationError(""); } }, [modelUrl]);
+  useEffect(() => { if (!modelUrl) { setModelNodes([]); setSelectedNodeId(""); setNodeSearch(""); setCollapsedNodeIds([]); setModelAnnotations([]); setMeasurementStartId(""); setCameraCommand(null); setAnnotationTitle(""); setAnnotationDetail(""); setAnnotationError(""); } }, [modelUrl]);
 
   async function handleFile(file?: File) {
     if (!file) return;
@@ -566,15 +591,22 @@ export default function Studio3DPage() {
             <div><span className="eyebrow">INTERACTIVE VIEWPORT</span><strong>{modelUrl ? "LOCAL MODEL" : "DEMONSTRATION SCENE"}</strong></div>
             <div className="studio-toolbar-actions">
               <button className="studio-tool-button" onClick={() => setShowAnnotations((value) => !value)} aria-pressed={showAnnotations}><Icon name="map" size={15} /> {showAnnotations ? "Hide labels" : "Show labels"}</button>
-              <button className="studio-tool-button" onClick={() => setResetKey((value) => value + 1)} aria-label="Reset 3D viewport camera"><Icon name="arrow" size={15} /> Reset view</button>
+              <button className="studio-tool-button" onClick={() => { setResetKey((value) => value + 1); requestCameraView("fit"); }} aria-label="Reset 3D viewport camera"><Icon name="arrow" size={15} /> Fit scene</button>
               <button className="studio-tool-button" onClick={() => setDark((value) => !value)} aria-pressed={dark}><Icon name="sun" size={15} /> Lighting</button>
             </div>
+          </div>
+          <div className="studio-view-presets" role="group" aria-label="Camera view presets">
+            {(["front", "back", "left", "right", "top", "bottom", "isometric"] as CameraPreset[]).map((preset) =>
+              <button key={preset} type="button" className="studio-tool-button" onClick={() => requestCameraView(preset)}
+                aria-label={`${preset[0].toUpperCase()}${preset.slice(1)} view`}>{preset[0].toUpperCase()}{preset.slice(1)}</button>
+            )}
+            {modelUrl && selectedModelNode && <button type="button" className="studio-tool-button" onClick={() => requestCameraView("isometric", selectedModelNode.worldPosition)}>Focus selected</button>}
           </div>
           <div className="studio-canvas-wrap">
             <p id="studio-viewport-instructions" className="studio-sr-only">The 3D viewport is keyboard focusable. Use the Reset view button to restore the default view. Annotation controls are available in the Explore features panel. The viewport also supports pointer and touch navigation.</p>
             <Scene modelUrl={modelUrl} showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation}
               onSelect={setSelectedAnnotation} resetKey={resetKey} dark={dark} dpr={renderDpr} reducedMotion={reducedMotion} onPerformanceSample={handlePerformanceSample}
-              selectedNodeId={selectedNodeId} onHierarchyChange={handleHierarchyChange} />
+              selectedNodeId={selectedNodeId} onHierarchyChange={handleHierarchyChange} cameraCommand={cameraCommand} />
             <div className="studio-viewer-hint"><span>DRAG · ORBIT</span><span>SCROLL · ZOOM</span><span>RIGHT-DRAG · PAN</span></div>
           </div>
           <div className="studio-viewer-caption"><span><i className="studio-status-dot" /> Browser-local rendering</span><span>No model is uploaded to SPECTRA servers</span></div>
@@ -625,7 +657,7 @@ export default function Studio3DPage() {
             {selectedModelNode && <div className="studio-node-properties" aria-live="polite">
               <strong>Selected object · {selectedModelNode.type}</strong>
               <span>Name: {selectedModelNode.name}</span>
-              <span>Position: {selectedModelNode.position.map((value) => value.toFixed(3)).join(", ")}</span>
+              <span>Local position: {selectedModelNode.position.map((value) => value.toFixed(3)).join(", ")}</span>\n              <span>World position: {selectedModelNode.worldPosition.map((value) => value.toFixed(3)).join(", ")}</span>\n              {selectedModelNode.boundsSize && <span>World bounds (W × H × D): {selectedModelNode.boundsSize.map((value) => value.toFixed(3)).join(" × ")}</span>}
               <span>Rotation: {selectedModelNode.rotation.map((value) => value.toFixed(3)).join(", ")}</span>
               <span>Scale: {selectedModelNode.scale.map((value) => value.toFixed(3)).join(", ")}</span>
               <span>Visible: {selectedModelNode.visible ? "Yes" : "No"}</span>
@@ -676,7 +708,7 @@ export default function Studio3DPage() {
       </section>
 
       <section className="studio-bottom-grid">
-        <article className="studio-info-card"><span className="eyebrow">CONTROLS</span><h2>Navigate the model</h2><ul><li><strong>Orbit:</strong> drag with the primary pointer.</li><li><strong>Zoom:</strong> use the mouse wheel or trackpad gesture.</li><li><strong>Pan:</strong> right-drag or use the supported touch gesture.</li><li><strong>Reset:</strong> restore the default camera position at any time.</li></ul></article>
+        <article className="studio-info-card"><span className="eyebrow">CONTROLS</span><h2>Navigate the model</h2><ul><li><strong>Orbit:</strong> drag with the primary pointer.</li><li><strong>Zoom:</strong> use the mouse wheel or trackpad gesture.</li><li><strong>Pan:</strong> right-drag or use the supported touch gesture.</li><li><strong>Views:</strong> use front, back, left, right, top, bottom or isometric presets.</li><li><strong>Focus / fit:</strong> centre the selected object or restore the scene view.</li></ul></article>
         <article className="studio-info-card"><span className="eyebrow">MODEL GOVERNANCE</span><h2>Responsible asset handling</h2><ul><li>Use only assets you are authorised to view and process.</li><li>Do not assume publicly accessible models are openly licensed.</li><li>Keep source, creator, licence and attribution details with every published model.</li><li>Imported assets are processed locally and are not saved to the repository.</li></ul></article>
       </section>
       <p className="studio-accessibility-note">Accessibility: keyboard-focusable viewport, labelled controls, selectable text annotations and a text-based learning alternative are provided. Reduced-motion preferences disable inertial camera damping. If WebGL is unavailable or a model cannot be rendered, use the model information and annotation text.</p>
