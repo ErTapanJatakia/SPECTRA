@@ -1,0 +1,191 @@
+SPECTRA PROPRIETARY RIGHTS-RESERVED LICENCE
+Custom Licence — Version 1.0
+Effective date: 4 November 2026
+
+Copyright (c) 2026 Er. Tapan Jatakia. All rights reserved.
+
+IMPORTANT NOTICE
+This is a custom proprietary, all-rights-reserved licence. It is not an
+open-source licence, a free-software licence, or a public-domain dedication.
+No general permission to use, copy, modify, distribute, publish, commercialise,
+or create derivative works from the Licensed Materials is granted.
+
+1. DEFINITIONS AND SCOPE
+
+1.1 "Owner" means Er. Tapan Jatakia, or any successor or assignee who
+demonstrably holds the relevant rights.
+
+1.2 "Licensed Materials" means only those source files, software, documentation,
+written content, schemas, original designs, graphics, project branding, and
+other materials in the SPECTRA repository that the Owner owns or is legally
+authorised to license.
+
+1.3 "Third-Party Materials" means any material not owned or controlled by the
+Owner, including third-party software, libraries, fonts, datasets, standards,
+publications, photographs, maps, trademarks, manufacturer material, and other
+externally sourced content.
+
+1.4 This Licence applies only to the Licensed Materials. It does not transfer
+ownership of any intellectual property, grant rights in Third-Party Materials,
+or override a separate licence or mandatory legal right.
+
+2. OWNERSHIP AND RESERVATION OF RIGHTS
+
+2.1 The Owner reserves all rights, title, and interest in the Licensed Materials,
+including all copyright and other intellectual-property rights, to the fullest
+extent permitted by applicable law.
+
+2.2 Except for rights that arise independently under the GitHub Terms of Service
+or mandatory applicable law, no licence or other permission is granted by
+implication, estoppel, exhaustion, publication, repository visibility, access,
+or otherwise.
+
+3. RESTRICTIONS
+
+Except where the Owner has granted prior express written permission, or where
+a non-waivable legal exception applies, you must not:
+
+(a) reproduce, copy, download for reuse, or otherwise exploit the Licensed
+    Materials outside the permissions independently provided by the hosting
+    platform;
+(b) modify, adapt, translate, arrange, or create derivative works from the
+    Licensed Materials;
+(c) redistribute, republish, mirror, sublicense, sell, rent, lease, or make the
+    Licensed Materials available to another person or service;
+(d) incorporate the Licensed Materials into another product, repository,
+    dataset, service, course, publication, or commercial offering;
+(e) use the Licensed Materials, project branding, or original project assets
+    to imply endorsement, affiliation, sponsorship, certification, or approval
+    by the Owner or by any government, military, international organisation,
+    manufacturer, or institution;
+(f) remove, obscure, or alter proprietary notices, attribution notices, or
+    rights-management information; or
+(g) circumvent access controls or use the Licensed Materials in a manner that
+    infringes the Owner's rights.
+
+Nothing in this section prohibits conduct that applicable law does not permit
+the Owner to restrict.
+
+4. NO GENERAL EDUCATIONAL OR COMMERCIAL REUSE PERMISSION
+
+The fact that SPECTRA is an educational and research-oriented project does not
+place its source code, documentation, images, datasets, interface designs, or
+other Licensed Materials into the public domain and does not grant an implied
+right to reproduce or reuse them in education, research, training, or commerce.
+
+Permission for a particular use must be obtained in writing from the Owner.
+Any permission may be limited by purpose, duration, territory, audience,
+distribution method, and other conditions stated in the written authorisation.
+
+5. PUBLIC GITHUB REPOSITORY — PLATFORM TERMS TAKE PRECEDENCE
+
+5.1 The repository is currently public. The Owner's use of GitHub is subject to
+the GitHub Terms of Service and other applicable GitHub policies, as amended
+from time to time:
+https://docs.github.com/en/site-policy/github-terms/github-terms-of-service
+
+5.2 GitHub's platform terms independently provide GitHub and its Affiliates
+with specified permissions to host, store, display, copy, process, and otherwise
+use repository content for operation and improvement of GitHub services,
+including the AI and machine-learning uses described in those terms.
+
+5.3 GitHub's public-repository terms also permit other GitHub users to view and
+fork public repositories through GitHub's functionality. This Licence does not
+purport to cancel, narrow, or override rights granted independently by GitHub's
+Terms of Service. The current GitHub terms should be read before relying on any
+assumption about public-repository access, forking, or platform processing.
+
+5.4 This Licence grants no additional independent permission beyond those
+platform-level rights. To the maximum extent permitted by applicable law, all
+other rights in the Licensed Materials remain reserved.
+
+5.5 Making this repository public is not a representation that the Licensed
+Materials are open source or available for unrestricted reuse. GitHub explains
+the relationship between public repositories and licensing here:
+https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository
+
+6. THIRD-PARTY MATERIALS AND CONTRIBUTIONS
+
+6.1 Third-Party Materials are not covered by this Licence unless their rights
+holder expressly places them under it. They remain subject to their own licence,
+terms, attribution, and usage restrictions.
+
+6.2 No third-party image, model, dataset, document, font, library, standard,
+manufacturer mark, or other asset may be assumed to be freely reusable merely
+because it is visible, linked, indexed, or referenced in this repository.
+
+6.3 The Owner does not claim ownership of third-party names, marks, products,
+technical specifications, or source materials. Where Third-Party Materials
+are included, their separate notices and licence terms govern.
+
+6.4 Do not submit a pull request containing material you do not own or are not
+authorised to contribute. A contribution is not accepted merely because it is
+submitted. Any contributor arrangement or different licensing terms must be
+agreed in writing before incorporation.
+
+7. TRADEMARKS AND PROJECT IDENTITY
+
+The names SPECTRA, its expansion, project logos, identifiers, distinctive
+branding, and visual identity are reserved to the extent protectable by law.
+This Licence does not grant permission to use any project name, logo, mark,
+or visual identity for a product, service, organisation, event, or publication
+without prior written authorisation.
+
+8. DISCLAIMER OF WARRANTIES
+
+THE LICENSED MATERIALS ARE PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY,
+OR OTHERWISE, INCLUDING WARRANTIES OF TITLE, NON-INFRINGEMENT, ACCURACY,
+COMPLETENESS, MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
+CONTINUED AVAILABILITY, TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW.
+
+The project is educational and informational. It is not an operational manual,
+professional advice, an official military publication, an accredited training
+programme, or a substitute for authorised instruction, applicable law, or
+institutional procedures.
+
+9. LIMITATION OF LIABILITY
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE OWNER SHALL NOT BE
+LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, CONSEQUENTIAL, OR
+PUNITIVE LOSS, OR FOR LOSS OF PROFITS, REVENUE, DATA, GOODWILL, BUSINESS
+OPPORTUNITY, OR BUSINESS INTERRUPTION ARISING FROM OR RELATING TO THE
+LICENSED MATERIALS OR THIS LICENCE.
+
+Nothing in this Licence excludes or limits liability that cannot lawfully be
+excluded or limited.
+
+10. TERMINATION
+
+Any permission expressly granted under a separate written authorisation may
+be terminated in accordance with that authorisation. Any purported use outside
+the rights available under GitHub's platform terms or applicable law is
+unauthorised. Termination does not affect rights or obligations that accrued
+before termination or provisions that by their nature survive it.
+
+11. GENERAL
+
+11.1 No waiver. A failure or delay in enforcing a right is not a waiver of it.
+
+11.2 Severability. If a provision is held invalid or unenforceable, it shall be
+modified to the minimum extent necessary, and the remaining provisions shall
+continue to apply.
+
+11.3 No partnership. This Licence does not create a partnership, agency,
+employment, joint venture, or endorsement relationship.
+
+11.4 Applicable law. This Licence is subject to applicable mandatory laws.
+Nothing in it is intended to remove rights that cannot legally be waived.
+
+12. PERMISSION REQUESTS
+
+For a request to license or otherwise reuse the Licensed Materials, contact the
+Owner through the GitHub profile associated with the SPECTRA repository:
+https://github.com/ErTapanJatakia
+
+END OF LICENCE
+
+Legal note: This custom licence is a project rights notice, not legal advice or
+a substitute for review by qualified intellectual-property counsel in the
+relevant jurisdictions. Its enforceability and interaction with platform
+terms and mandatory law should be reviewed before commercial enforcement.
