@@ -22,7 +22,7 @@ async function readJson<T extends object>(relativePath: string, parser: { parse:
       return parser.parse(record);
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
-      throw new Error(`${relativePath}[${index}]: ${detail}`);
+      throw new Error(`${relativePath}[${index}]: ${detail}`, { cause: error });
     }
   });
 }
