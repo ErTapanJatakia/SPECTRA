@@ -1,4 +1,4 @@
-![SPECTRA — Global Defence Systems & Peace Operations Learning Atlas](assets/branding/spectra-hero.jpg)
+![SPECTRA — Global Defence Systems & Peace Operations Learning Atlas]
 
 <div align="center">
 
@@ -15,6 +15,9 @@
 [Proprietary Licence](LICENSE)
 
 </div>
+
+<img width="1672" height="941" alt="SPECTRA Defence Training Briefing" src="https://github.com/user-attachments/assets/4c89a4be-625b-41c4-8f60-8585b9a86d3f" />
+
 
 ---
 
@@ -213,3 +216,4 @@ The project does not claim affiliation with or endorsement by the United Nations
 [View the repository](https://github.com/ErTapanJatakia/SPECTRA)
 
 </div>
+<img width="2172" height="724" alt="Cinematic Military Technology Briefing at Dusk-1" src="https://github.com/user-attachments/assets/caa4e788-41dc-4c10-b5a9-2cf5946775d2" />
