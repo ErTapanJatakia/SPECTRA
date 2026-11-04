@@ -453,6 +453,7 @@ export default function Studio3DPage() {
   const [modelNodes, setModelNodes] = useState<ModelNodeSnapshot[]>([]);
   const [selectedNodeId, setSelectedNodeId] = useState("");
   const [nodeSearch, setNodeSearch] = useState("");
+  const [collapsedNodeIds, setCollapsedNodeIds] = useState<string[]>([]);
   const [modelAnnotations, setModelAnnotations] = useState<ModelAnnotation[]>([]);
   const [annotationTitle, setAnnotationTitle] = useState("");
   const [annotationDetail, setAnnotationDetail] = useState("");
@@ -471,8 +472,21 @@ export default function Studio3DPage() {
 
   const visibleModelNodes = useMemo(() => {
     const query = nodeSearch.trim().toLowerCase();
-    return modelNodes.filter((node) => !query || `${node.name} ${node.type} ${node.materials?.join(" ") ?? ""}`.toLowerCase().includes(query)).slice(0, 200);
-  }, [modelNodes, nodeSearch]);
+    const matches = (node: ModelNodeSnapshot) => !query ||
+      `${node.name} ${node.type} ${node.materials?.join(" ") ?? ""}`.toLowerCase().includes(query);
+    const hasMatchingDescendant = (id: string): boolean =>
+      modelNodes.some((candidate) => candidate.parentId === id && (matches(candidate) || hasMatchingDescendant(candidate.id)));
+    return modelNodes.filter((node) => {
+      if (query && !matches(node) && !hasMatchingDescendant(node.id)) return false;
+      if (query) return true;
+      let parentId = node.parentId;
+      while (parentId) {
+        if (collapsedNodeIds.includes(parentId)) return false;
+        parentId = modelNodes.find((candidate) => candidate.id === parentId)?.parentId ?? null;
+      }
+      return true;
+    }).slice(0, 200);
+  }, [modelNodes, nodeSearch, collapsedNodeIds]);
   const selectedModelNode = modelNodes.find((node) => node.id === selectedNodeId);
 
   const handlePerformanceSample = useCallback((sample: PerformanceSample) => {
@@ -493,7 +507,7 @@ export default function Studio3DPage() {
   }, []);
 
   useEffect(() => () => { if (modelUrl) { useGLTF.clear(modelUrl); URL.revokeObjectURL(modelUrl); } }, [modelUrl]);
-  useEffect(() => { if (!modelUrl) { setModelNodes([]); setSelectedNodeId(""); setNodeSearch(""); setModelAnnotations([]); setAnnotationTitle(""); setAnnotationDetail(""); setAnnotationError(""); } }, [modelUrl]);
+  useEffect(() => { if (!modelUrl) { setModelNodes([]); setSelectedNodeId(""); setNodeSearch(""); setCollapsedNodeIds([]); setModelAnnotations([]); setAnnotationTitle(""); setAnnotationDetail(""); setAnnotationError(""); } }, [modelUrl]);
 
   async function handleFile(file?: File) {
     if (!file) return;
@@ -590,12 +604,20 @@ export default function Studio3DPage() {
             <p>Read-only view of the loaded Three.js scene. Node names are labels, not trusted metadata.</p>
             <label htmlFor="studio-node-search">Search objects<input id="studio-node-search" type="search" value={nodeSearch} onChange={(event) => setNodeSearch(event.target.value)} placeholder="Name, type or material" /></label>
             <div className="studio-node-tree" role="group" aria-label="Model objects">
-              {visibleModelNodes.map((node) => <button key={node.id} type="button"
-                className={`studio-node-item ${selectedNodeId === node.id ? "studio-node-active" : ""}`}
-                style={{ paddingLeft: `${10 + node.id.split(".").length * 12}px` }}
-                onClick={() => setSelectedNodeId(node.id)} aria-pressed={selectedNodeId === node.id}>
-                <span>{node.isMesh ? "◈" : "▸"}</span><strong>{node.name}</strong><small>{node.type}</small>
-              </button>)}
+              {visibleModelNodes.map((node) => {
+                const hasChildren = modelNodes.some((candidate) => candidate.parentId === node.id);
+                const expanded = !collapsedNodeIds.includes(node.id);
+                return <div className="studio-node-row" key={node.id} style={{ paddingLeft: `${(node.id.split(".").length - 1) * 12}px` }}>
+                  {hasChildren ? <button type="button" className="studio-node-toggle" aria-label={`${expanded ? "Collapse" : "Expand"} ${node.name}`}
+                    aria-expanded={expanded} onClick={() => setCollapsedNodeIds((current) =>
+                      expanded ? [...current, node.id] : current.filter((id) => id !== node.id)
+                    )}>{expanded ? "▾" : "▸"}</button> : <span className="studio-node-toggle-placeholder" />}
+                  <button type="button" className={`studio-node-item ${selectedNodeId === node.id ? "studio-node-active" : ""}`}
+                    onClick={() => setSelectedNodeId(node.id)} aria-pressed={selectedNodeId === node.id}>
+                    <span>{node.isMesh ? "◈" : "◇"}</span><strong>{node.name}</strong><small>{node.type}</small>
+                  </button>
+                </div>;
+              })}
               {visibleModelNodes.length === 0 && <p className="studio-inspector-empty">No matching scene objects.</p>}
             </div>
             {modelNodes.length > 200 && <p className="studio-inspector-empty">Showing up to 200 matching objects of {modelNodes.length.toLocaleString("en-US")}.</p>}
