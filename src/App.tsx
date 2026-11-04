@@ -8,6 +8,7 @@ import EquipmentCataloguePage from "./pages/EquipmentCataloguePage";
 import EquipmentProfilePage from "./pages/EquipmentProfilePage";
 import SearchPage from "./pages/SearchPage";
 import PlaceholderPage from "./pages/PlaceholderPage";
+import Studio3DPage from "./pages/Studio3DPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 export default function App() {
@@ -22,7 +23,7 @@ export default function App() {
           <Route path="equipment/:slug" element={<EquipmentProfilePage />} />
           <Route path="domains/:slug" element={<DomainPage />} />
           <Route path="search" element={<SearchPage />} />
-          <Route path="studio-3d" element={<PlaceholderPage page="studio" />} />
+          <Route path="studio-3d" element={<Studio3DPage />} />
           <Route path="academy" element={<PlaceholderPage page="academy" />} />
           <Route path="peacekeeping" element={<PlaceholderPage page="peacekeeping" />} />
           <Route path="research" element={<PlaceholderPage page="research" />} />
