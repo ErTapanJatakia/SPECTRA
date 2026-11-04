@@ -381,3 +381,28 @@ test("3D Studio survives repeated local model import and unload cycles", async (
   });
   expect(totals).toEqual({ created: 3, revoked: 3 });
 });
+
+
+test("3D Studio exposes a searchable hierarchy and read-only object properties for imported models", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const model = {
+    asset: { version: "2.0" },
+    scene: 0,
+    scenes: [{ nodes: [] }]
+  };
+  await page.locator("#studio-model-file").setInputFiles({
+    name: "inspector-model.gltf",
+    mimeType: "model/gltf+json",
+    buffer: Buffer.from(JSON.stringify(model))
+  });
+  await expect(page.getByRole("heading", { name: "Scene hierarchy" })).toBeVisible();
+  const rootNode = page.getByRole("button", { name: /Group 0.*Group/ }).first();
+  await expect(rootNode).toBeVisible();
+  await rootNode.click();
+  await expect(page.getByText("Selected object · Group")).toBeVisible();
+  await expect(page.getByText(/Position: 0\.000, 0\.000, 0\.000/)).toBeVisible();
+  await page.getByLabel("Search objects").fill("no-such-object");
+  await expect(page.getByText("No matching scene objects.")).toBeVisible();
+  await page.getByLabel("Search objects").fill("Group");
+  await expect(rootNode).toBeVisible();
+});
