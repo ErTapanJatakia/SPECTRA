@@ -309,7 +309,7 @@ test("3D Studio exposes live rendering telemetry and adaptive quality", async ({
   await expect(monitor).toBeVisible();
   await expect(monitor).toContainText("PERFORMANCE MONITOR");
   await expect(monitor).toContainText("Adaptive render scale");
-  await expect(monitor).toContainText(/\\d+ FPS/, { timeout: 10000 });
+  await expect(monitor).toContainText(/\d+ FPS/, { timeout: 10000 });
 });
 
 test("3D Studio survives repeated local model import and unload cycles", async ({ page }) => {
