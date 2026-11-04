@@ -95,9 +95,9 @@ async function validateModelFile(file: File, extension: string): Promise<void> {
 
   const array = (name: string, maximum: number): unknown[] => {
     const value = document[name];
-    if (value !== undefined && !Array.isArray(value)) throw new Error(\`The model's \${name} property must be an array.\`);
+    if (value !== undefined && !Array.isArray(value)) throw new Error(`The model's ${name} property must be an array.`);
     const result = Array.isArray(value) ? value : [];
-    if (result.length > maximum) throw new Error(\`The model contains too many \${name} (maximum \${maximum.toLocaleString("en-US")}).\`);
+    if (result.length > maximum) throw new Error(`The model contains too many ${name} (maximum ${maximum.toLocaleString("en-US")}).`);
     return result;
   };
   const nodes = array("nodes", MAX_NODES);
