@@ -14,7 +14,7 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files:["src/**/*.{ts,tsx}","tests/**/*.{ts,tsx}","*.ts"],
+    files:["src/**/*.{ts,tsx}","scripts/**/*.ts","tests/**/*.{ts,tsx}","*.ts"],
     languageOptions:{globals:browserGlobals},
     rules:{
       "@typescript-eslint/no-explicit-any":"error",

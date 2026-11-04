@@ -1,0 +1,52 @@
+[
+  {
+    "id": "domain-infantry",
+    "slug": "infantry-small-arms",
+    "title": "Infantry & Small Arms Systems"
+  },
+  {
+    "id": "domain-land",
+    "slug": "land-systems",
+    "title": "Land Systems"
+  },
+  {
+    "id": "domain-aerospace",
+    "slug": "aerospace-unmanned",
+    "title": "Aerospace & Unmanned Systems"
+  },
+  {
+    "id": "domain-surveillance",
+    "slug": "surveillance-intelligence",
+    "title": "Surveillance & Intelligence Systems"
+  },
+  {
+    "id": "domain-naval",
+    "slug": "naval-maritime",
+    "title": "Naval & Maritime Systems"
+  },
+  {
+    "id": "domain-c4isr",
+    "slug": "c4isr-electronic-systems",
+    "title": "C4ISR & Electronic Systems"
+  },
+  {
+    "id": "domain-cyber",
+    "slug": "cyber-digital-defence",
+    "title": "Cyber & Digital Defence"
+  },
+  {
+    "id": "domain-peacekeeping",
+    "slug": "peacekeeping",
+    "title": "UN Peacekeeping Education"
+  },
+  {
+    "id": "domain-academy",
+    "slug": "learning-academy",
+    "title": "Learning Academy"
+  },
+  {
+    "id": "domain-research",
+    "slug": "research-emerging-technology",
+    "title": "Research & Emerging Technology"
+  }
+]

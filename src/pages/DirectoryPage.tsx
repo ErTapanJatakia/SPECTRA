@@ -1,23 +1,27 @@
+import { Link } from "react-router";
 import PageHeading from "../components/PageHeading";
-import EmptyState from "../components/EmptyState";
 import Icon from "../components/Icon";
-
-const directoryDimensions = [
-  { title:"Country of origin", detail:"Separate design origin, manufacturing location and ownership.", icon:"globe" as const },
-  { title:"Military organisation", detail:"Represent service branches, joint commands and institutions.", icon:"shield" as const },
-  { title:"Manufacturer & developer", detail:"Connect equipment records to attributed developer relationships.", icon:"layers" as const },
-  { title:"Operator & historical context", detail:"Record publicly documented use with date-aware relationships.", icon:"clock" as const },
-];
+import { countries, getEquipmentForCountry } from "../data/knowledgeBase";
 
 export default function DirectoryPage() {
   return (
     <div className="page-stack">
-      <PageHeading eyebrow="GLOBAL DIRECTORY" title="Countries & armed forces" description="A multidimensional directory for geographic origin, military organisations, manufacturers and publicly documented operators." />
-      <div className="info-strip"><Icon name="info" size={18} /><span>The directory framework is part of the foundation release. Country and organisation records will be added after source and editorial validation.</span></div>
-      <div className="directory-grid">
-        {directoryDimensions.map((item) => <article className="directory-card" key={item.title}><div className="directory-icon"><Icon name={item.icon} size={21} /></div><h3>{item.title}</h3><p>{item.detail}</p></article>)}
+      <PageHeading eyebrow="GLOBAL DIRECTORY / ISO 3166" title="Countries & armed forces" description="Country identity uses ISO 3166-1 alpha-2 and alpha-3 identifiers. Origin, development, manufacturer and operator relationships are stored separately." />
+      <div className="info-strip"><Icon name="info" size={18} /><span>This is an initial five-country sample directory, not a comprehensive list of national armed forces or equipment inventories. Country records link to individually sourced equipment profiles.</span></div>
+      <div className="country-grid">
+        {countries.map((country) => {
+          const count = getEquipmentForCountry(country.id).length;
+          return (
+            <Link className="country-card" key={country.id} to={`/countries/${country.id}`}>
+              <div className="country-card-top"><span className="country-code">{country.isoAlpha2}</span><span className="country-alpha3">{country.isoAlpha3}</span></div>
+              <h2>{country.name}</h2>
+              <p>{country.region}</p>
+              <div className="country-card-footer"><span>{count} sample records</span><Icon name="arrow" size={17} /></div>
+            </Link>
+          );
+        })}
       </div>
-      <EmptyState title="Country records are not published yet" description="The directory schema and navigation entry point are established. Verified geographic and organisational records will be introduced in the knowledge-base stage." icon="map" />
+      <div className="catalogue-governance"><strong>Classification principle</strong><span>ISO codes identify the country. They do not independently establish sovereignty, military ownership, current equipment operators or territorial claims. Such relationships require separate, dated sources.</span></div>
     </div>
   );
 }

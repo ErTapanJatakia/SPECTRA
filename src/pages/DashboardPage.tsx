@@ -2,11 +2,12 @@ import { Link } from "react-router";
 import DomainCard from "../components/DomainCard";
 import Icon from "../components/Icon";
 import { domains } from "../data/domains";
+import { countries, equipmentRecords } from "../data/knowledgeBase";
 
 const highlights = [
-  { label:"Knowledge divisions", value:"10", detail:"Connected subject areas", icon:"layers" as const },
-  { label:"Mandatory accounts", value:"None", detail:"Browse without registration", icon:"lock" as const },
-  { label:"Infrastructure", value:"Free-first", detail:"Static-first product direction", icon:"globe" as const }
+  { label:"Knowledge divisions", value:String(domains.length), detail:"Connected subject areas", icon:"layers" as const },
+  { label:"Country profiles", value:String(countries.length), detail:"ISO-coded sample directory", icon:"globe" as const },
+  { label:"Equipment records", value:String(equipmentRecords.length), detail:"Curated and source-attributed", icon:"box" as const }
 ];
 
 export default function DashboardPage() {
@@ -24,10 +25,10 @@ export default function DashboardPage() {
             <Link className="button button-ghost" to="/academy">Learning pathways</Link>
           </div>
         </div>
-        <div className="welcome-index"><span>PROJECT INDEX</span><strong>SPX / 001</strong><small>FOUNDATION RELEASE</small></div>
+        <div className="welcome-index"><span>PROJECT INDEX</span><strong>SPX / 001</strong><small>KNOWLEDGE BASE RELEASE</small></div>
       </section>
 
-      <section className="stat-grid" aria-label="Project characteristics">
+      <section className="stat-grid" aria-label="Knowledge base counts">
         {highlights.map((item) => (
           <div className="stat-card" key={item.label}>
             <div className="stat-icon"><Icon name={item.icon} size={19} /></div>

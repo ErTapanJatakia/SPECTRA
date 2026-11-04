@@ -2,36 +2,43 @@
 
 ## Scope
 
-This document records the Prompt 02 foundation release. It establishes the application shell, responsive navigation, design tokens, theme preferences, module entry points, a navigation-domain search, PWA application-shell caching, and quality tooling.
+Prompt 02 established the application shell, responsive navigation, design tokens, theme preferences, module entry points, a division-only search, PWA application-shell caching, browser security headers and CI quality tooling.
+
+Prompt 03 adds the canonical content model, typed Zod schemas, an initial curated equipment dataset, country directory, equipment profile pages, multidimensional filtering, comparison and publication validation. See `docs/data-dictionary/CONTENT-MODEL.md` and `docs/editorial/RECORD-GOVERNANCE.md`.
 
 ## Current functionality
 
 - React + TypeScript + Vite application shell.
 - Responsive sidebar and top navigation.
-- Working system, light, dark, and high-contrast theme modes.
+- System, light, dark and high-contrast theme modes.
 - Ten knowledge-division entry points.
-- Search across the ten navigation divisions only.
-- Countries & Forces directory framework placeholder.
-- Explicit placeholder pages for Catalogue, 3D Studio, Academy, Peacekeeping, Research and Settings.
-- Static application manifest and a same-origin service worker.
-- Initial unit and browser test suites.
+- Search across knowledge divisions and the curated equipment sample.
+- Five ISO-coded country profiles.
+- Ten source-attributed equipment records across five countries.
+- Country, domain, category, operator-branch and public-status filters.
+- Equipment detail pages with source links and editorial confidence.
+- Side-by-side comparison of up to three records.
+- Zod schema validation and cross-reference checks for content records.
+- Static application manifest and same-origin service worker.
+- Unit and browser test suites.
 - GitHub Actions quality and lockfile workflows.
 
 ## Explicitly not implemented
 
-The foundation release does not include an equipment database, country records, live external datasets, 3D rendering, model ingestion, course content, account authentication, remote learner synchronisation, or official UN training material. Their entry points are labelled as not yet implemented.
+The current knowledge base is a curated sample, not an exhaustive world inventory. It does not include a global operator database, complete armed-forces directory, live external data feeds, 3D rendering, model ingestion, course content, account authentication, remote learner synchronisation, or official UN training material.
 
 ## Tooling compatibility decision
 
-TypeScript 6.0.3 is pinned for this bootstrap. The current typescript-eslint support matrix documents TypeScript support below 6.1. TypeScript 7.0.2 is available, but adopting it before the lint/parser ecosystem declares support would weaken reproducibility. Reassess this decision when typescript-eslint officially supports TypeScript 7.
+TypeScript 6.0.3 is pinned for this bootstrap. The selected typescript-eslint support line is not declared compatible with TypeScript 7. Reassess after the lint/parser ecosystem officially supports TypeScript 7.
 
 ## Operational model
 
-The application is static-first. Learner progress and preferences are not synchronised to a server. The service worker caches the application shell and same-origin static assets; it does not cache third-party material. Deployment and browser testing must verify offline behaviour before any release claim is made.
+The application is static-first. Learner preferences are local; progress is not synchronised to a server. Content is version-controlled. The service worker caches the application shell and same-origin static assets; it does not cache third-party source material.
 
-## Security notes
+## Security and editorial notes
 
-- No API keys, secrets, or credentials are required.
+- No API keys, secrets or credentials are required.
 - No third-party analytics or remote script dependency is introduced.
-- The CSP is same-origin-oriented; review it when adding new assets, workers, embeds, or external resources.
-- The public repository's proprietary licence does not override GitHub's platform terms or third-party asset licences.
+- Public sources are linked; their text, diagrams and images are not assumed to be reusable.
+- Equipment profiles are limited to non-operational educational content.
+- The SPECTRA proprietary licence does not override GitHub platform terms or third-party asset licences.

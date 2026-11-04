@@ -1,0 +1,22 @@
+[
+  {
+    "id": "function-armoured-land-platform",
+    "label": "Armoured land platform"
+  },
+  {
+    "id": "function-combat-aviation",
+    "label": "Combat aviation"
+  },
+  {
+    "id": "function-maritime-surface-combatant",
+    "label": "Maritime surface combatant"
+  },
+  {
+    "id": "function-mobile-artillery-system",
+    "label": "Mobile artillery system"
+  },
+  {
+    "id": "function-infantry-individual-equipment",
+    "label": "Individual infantry equipment"
+  }
+]

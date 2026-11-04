@@ -1,0 +1,65 @@
+[
+  {
+    "id": "IN",
+    "isoAlpha2": "IN",
+    "isoAlpha3": "IND",
+    "name": "India",
+    "aliases": [
+      "Bharat"
+    ],
+    "region": "South Asia",
+    "sourceIds": [
+      "src-iso3166"
+    ]
+  },
+  {
+    "id": "US",
+    "isoAlpha2": "US",
+    "isoAlpha3": "USA",
+    "name": "United States",
+    "aliases": [
+      "United States of America",
+      "USA"
+    ],
+    "region": "North America",
+    "sourceIds": [
+      "src-iso3166"
+    ]
+  },
+  {
+    "id": "GB",
+    "isoAlpha2": "GB",
+    "isoAlpha3": "GBR",
+    "name": "United Kingdom",
+    "aliases": [
+      "UK",
+      "Great Britain"
+    ],
+    "region": "Europe",
+    "sourceIds": [
+      "src-iso3166"
+    ]
+  },
+  {
+    "id": "FR",
+    "isoAlpha2": "FR",
+    "isoAlpha3": "FRA",
+    "name": "France",
+    "aliases": [],
+    "region": "Europe",
+    "sourceIds": [
+      "src-iso3166"
+    ]
+  },
+  {
+    "id": "JP",
+    "isoAlpha2": "JP",
+    "isoAlpha3": "JPN",
+    "name": "Japan",
+    "aliases": [],
+    "region": "East Asia",
+    "sourceIds": [
+      "src-iso3166"
+    ]
+  }
+]

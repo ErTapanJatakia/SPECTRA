@@ -9,6 +9,8 @@ interface HeaderProps { onMenuToggle: () => void; }
 function getPageLabel(pathname: string): string {
   if (pathname === "/") return "Overview";
   if (pathname.startsWith("/domains/")) return "Knowledge division";
+  if (pathname.startsWith("/equipment/")) return "Equipment profile";
+  if (pathname.startsWith("/countries/")) return "Country profile";
   const segment = pathname.split("/").filter(Boolean)[0] ?? "";
   const labels: Record<string,string> = {
     catalogue:"Equipment catalogue", countries:"Countries & forces",
@@ -36,7 +38,7 @@ export default function Header({ onMenuToggle }: HeaderProps) {
       <div className="breadcrumb"><span className="breadcrumb-root">SPECTRA</span><Icon name="chevron" size={14} /><span>{getPageLabel(location.pathname)}</span></div>
       <form className="global-search" role="search" onSubmit={handleSubmit}>
         <Icon name="search" size={17} />
-        <input type="search" aria-label="Search SPECTRA divisions" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search knowledge divisions..." />
+        <input type="search" aria-label="Search SPECTRA divisions and equipment" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search countries, systems, equipment..." />
         <kbd>Enter</kbd>
       </form>
       <div className="topbar-actions">

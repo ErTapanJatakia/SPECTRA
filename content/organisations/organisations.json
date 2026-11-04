@@ -1,0 +1,117 @@
+[
+  {
+    "id": "org-indian-army",
+    "name": "Indian Army",
+    "countryId": "IN",
+    "branch": "land",
+    "organisationType": "armed_force",
+    "sourceIds": [
+      "src-indian-army-directory"
+    ]
+  },
+  {
+    "id": "org-indian-air-force",
+    "name": "Indian Air Force",
+    "countryId": "IN",
+    "branch": "air",
+    "organisationType": "armed_force",
+    "sourceIds": [
+      "src-iaf-about",
+      "src-hal-tejas"
+    ]
+  },
+  {
+    "id": "org-drdo",
+    "name": "Defence Research and Development Organisation (DRDO)",
+    "countryId": "IN",
+    "branch": "research",
+    "organisationType": "research_agency",
+    "sourceIds": [
+      "src-drdo-arjun"
+    ]
+  },
+  {
+    "id": "org-cvrde",
+    "name": "Combat Vehicles Research and Development Establishment (CVRDE)",
+    "countryId": "IN",
+    "branch": "research",
+    "organisationType": "research_agency",
+    "sourceIds": [
+      "src-drdo-arjun"
+    ]
+  },
+  {
+    "id": "org-us-army",
+    "name": "United States Army",
+    "countryId": "US",
+    "branch": "land",
+    "organisationType": "armed_force",
+    "sourceIds": [
+      "src-usarmy-m1"
+    ]
+  },
+  {
+    "id": "org-us-navy",
+    "name": "United States Navy",
+    "countryId": "US",
+    "branch": "naval",
+    "organisationType": "armed_force",
+    "sourceIds": [
+      "src-usnavy-ddg51"
+    ]
+  },
+  {
+    "id": "org-british-army",
+    "name": "British Army",
+    "countryId": "GB",
+    "branch": "land",
+    "organisationType": "armed_force",
+    "sourceIds": [
+      "src-british-army-challenger"
+    ]
+  },
+  {
+    "id": "org-royal-navy",
+    "name": "Royal Navy",
+    "countryId": "GB",
+    "branch": "naval",
+    "organisationType": "armed_force",
+    "sourceIds": [
+      "src-royal-navy-type45"
+    ]
+  },
+  {
+    "id": "org-french-army",
+    "name": "French Army (Armée de Terre)",
+    "countryId": "FR",
+    "branch": "land",
+    "organisationType": "armed_force",
+    "sourceIds": [
+      "src-fr-leclerc",
+      "src-fr-caesar",
+      "src-fr-army-portal"
+    ]
+  },
+  {
+    "id": "org-jgsdf",
+    "name": "Japan Ground Self-Defense Force",
+    "countryId": "JP",
+    "branch": "land",
+    "organisationType": "armed_force",
+    "sourceIds": [
+      "src-japan-atla-type10",
+      "src-jmod-structure"
+    ]
+  },
+  {
+    "id": "org-jmsdf",
+    "name": "Japan Maritime Self-Defense Force",
+    "countryId": "JP",
+    "branch": "naval",
+    "organisationType": "armed_force",
+    "sourceIds": [
+      "src-jmsdf-mogami",
+      "src-jmod-structure"
+    ]
+  }
+]

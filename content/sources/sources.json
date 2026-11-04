@@ -1,0 +1,227 @@
+[
+  {
+    "id": "src-iso3166",
+    "title": "ISO 3166 — Country Codes",
+    "publisher": "International Organization for Standardization (ISO)",
+    "sourceType": "standards_body",
+    "reliability": "primary",
+    "url": "https://www.iso.org/iso-3166-country-codes.html",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Use ISO codes as identifiers; source page is linked rather than reproduced."
+    }
+  },
+  {
+    "id": "src-drdo-arjun",
+    "title": "DRDO Products for Export — Arjun Main Battle Tank Mk IA",
+    "publisher": "Defence Research and Development Organisation, Government of India",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.drdo.gov.in/drdo/sites/default/files/schemes_services/DRDO-Product-for-Export-2021_web.pdf",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official source linked; no PDF content reproduced."
+    }
+  },
+  {
+    "id": "src-hal-tejas",
+    "title": "Light Combat Aircraft (LCA) Tejas",
+    "publisher": "Hindustan Aeronautics Limited",
+    "sourceType": "manufacturer",
+    "reliability": "primary",
+    "url": "https://hal-india.co.in/product/lca",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Manufacturer page linked; HAL text and imagery are not republished."
+    }
+  },
+  {
+    "id": "src-indian-army-directory",
+    "title": "Website of Indian Army",
+    "publisher": "National Portal of India, Ministry of Defence",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.india.gov.in/category/defence-foreign-affairs/subcategory/defence/details/website-of-indian-army",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official Government of India directory entry linked."
+    }
+  },
+  {
+    "id": "src-iaf-about",
+    "title": "About the Indian Air Force",
+    "publisher": "Indian Air Force, Government of India",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.careerairforce.gov.in/about-iaf",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official Indian Air Force information page linked."
+    }
+  },
+  {
+    "id": "src-usarmy-m1",
+    "title": "Army Announces Plans for M1E3 Abrams Tank Modernization",
+    "publisher": "United States Army Public Affairs",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.army.mil/article/269706",
+    "publicationDate": "2023-09-06",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official US Army article linked; source text is not reproduced."
+    }
+  },
+  {
+    "id": "src-usnavy-ddg51",
+    "title": "Destroyers (DDG 51)",
+    "publisher": "United States Navy",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.navy.mil/Resources/Fact-Files/Display-FactFiles/Article/2169871/destroyers-ddg-51/",
+    "publicationDate": "2026-07-07",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official US Navy fact file linked; no imagery copied."
+    }
+  },
+  {
+    "id": "src-british-army-challenger",
+    "title": "Challenger 2",
+    "publisher": "The British Army, Ministry of Defence",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.army.mod.uk/learn-and-explore/equipment/combat-vehicles/challenger-2/",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official equipment page linked; no source imagery or detailed tables reproduced."
+    }
+  },
+  {
+    "id": "src-royal-navy-type45",
+    "title": "Daring Class Type 45 Destroyer",
+    "publisher": "Royal Navy, Ministry of Defence",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.royalnavy.mod.uk/equipment/ships/daring-class",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official equipment page linked; no source imagery reproduced."
+    }
+  },
+  {
+    "id": "src-fr-leclerc",
+    "title": "Char Leclerc",
+    "publisher": "Ministry of the Armed Forces and Veterans Affairs, France",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.defense.gouv.fr/en/node/212",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official French Ministry equipment page linked; no technical tables reproduced."
+    }
+  },
+  {
+    "id": "src-fr-caesar",
+    "title": "France, Croatia and Estonia Agree on Joint Acquisition of CAESAR Artillery Systems",
+    "publisher": "Ministry of the Armed Forces, France",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.defense.gouv.fr/sites/default/files/ministere-armees/19.06.2024%20La%20France%2C%20la%20Croatie%2C%20et%20l%E2%80%99Estonie%20concr%C3%A9tisent%20leur%20projet%20d%E2%80%99acquisition%20commune%20de%20canons%20CAESAR.pdf",
+    "publicationDate": "2024-06-19",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official press release linked; no document content republished."
+    }
+  },
+  {
+    "id": "src-fr-army-portal",
+    "title": "Portail Terre — French Army",
+    "publisher": "Ministry of the Armed Forces and Veterans Affairs, France",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.terre.defense.gouv.fr/en",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official French Army portal linked."
+    }
+  },
+  {
+    "id": "src-jmsdf-mogami",
+    "title": "JMSDF Equipment — Mogami Class",
+    "publisher": "Japan Maritime Self-Defense Force, Ministry of Defense",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.mod.go.jp/msdf/en/equipment/",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official equipment directory linked; no source imagery copied."
+    }
+  },
+  {
+    "id": "src-japan-atla-type10",
+    "title": "Equipment of the Ground Self-Defense Force — Type-10 Main Battle Tank",
+    "publisher": "Acquisition, Technology & Logistics Agency, Ministry of Defense, Japan",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.mod.go.jp/atla/en/policy/pdf/handout_FY2018.pdf",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official Japanese government handout linked; no specification table reproduced."
+    }
+  },
+  {
+    "id": "src-jmod-structure",
+    "title": "About the Japan Ministry of Defense and Self-Defense Forces",
+    "publisher": "Ministry of Defense, Japan",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://www.mod.go.jp/en/about/",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official institutional overview linked."
+    }
+  },
+  {
+    "id": "src-usarmy-m4a1",
+    "title": "M4A1 Carbine — Equipment Portfolio",
+    "publisher": "U.S. Army Combat Capabilities Development Command, Ground Vehicle Systems Center / Product Manager Soldier Lethality",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://cpeground.army.mil/Equipment/Equipment-Portfolio/PM-SL-Portfolio/M4A1-Carbine/",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official equipment portfolio page linked for identification only. No procedural, performance or operating details are reproduced."
+    }
+  },
+  {
+    "id": "src-usarmy-xm8-transition",
+    "title": "U.S. Army Announces XM8 Carbine Delivery Order",
+    "publisher": "U.S. Army Combat Capabilities Development Command, Ground Vehicle Systems Center",
+    "sourceType": "government",
+    "reliability": "primary",
+    "url": "https://cpeground.army.mil/News/Article-Display/Article/4451814/us-army-announces-xm8-carbine-delivery-order/",
+    "publicationDate": "2026-04-03",
+    "accessDate": "2026-11-04",
+    "licensing": {
+      "status": "link_only",
+      "note": "Official transition announcement linked to qualify the M4A1's status. No operational technical detail is reproduced."
+    }
+  }
+]

@@ -1,0 +1,616 @@
+[
+  {
+    "id": "eqp-arjun-mbt-mk1a",
+    "slug": "arjun-mbt-mk1a",
+    "name": "Arjun Main Battle Tank Mk IA",
+    "aliases": [
+      "Arjun Mk1A",
+      "Arjun MBT Mk IA"
+    ],
+    "designation": "Arjun MBT Mk IA",
+    "classification": {
+      "domainIds": [
+        "domain-land"
+      ],
+      "categoryId": "cat-main-battle-tank",
+      "functionIds": [
+        "function-armoured-land-platform"
+      ],
+      "platformTypes": [
+        "tracked-land-vehicle"
+      ]
+    },
+    "originCountryIds": [
+      "IN"
+    ],
+    "developmentCountryIds": [
+      "IN"
+    ],
+    "operatorOrganisationIds": [],
+    "manufacturerIds": [],
+    "developerOrganisationIds": [
+      "org-drdo",
+      "org-cvrde"
+    ],
+    "historical": {
+      "developmentPeriod": "Modern Indian armoured-vehicle programme",
+      "operationalStatus": "unknown"
+    },
+    "overview": "An Indian main battle tank variant documented by DRDO as an upgraded version of the Arjun Mk I. This profile is limited to identification, programme history and broad educational context.",
+    "historicalBackground": "DRDO's public product-for-export document describes the Mk IA as an upgraded Arjun Mk I variant and identifies the national research and development context.",
+    "designPhilosophy": "A domestically developed tracked armoured land platform. This summary intentionally avoids firing procedures, internal mechanisms, tactical employment and detailed performance data.",
+    "generalCharacteristics": [
+      "Tracked main battle tank platform.",
+      "Mk IA is described by DRDO as an upgraded Arjun Mk I variant.",
+      "The programme is associated with India's defence research and combat-vehicle development ecosystem."
+    ],
+    "sourceIds": [
+      "src-drdo-arjun"
+    ],
+    "editorial": {
+      "status": "published",
+      "confidence": "verified",
+      "lastVerified": "2026-11-04",
+      "reviewNote": "Primary DRDO product document supports the designation and broad variant relationship. Current service status and operator relationship are not asserted."
+    }
+  },
+  {
+    "id": "eqp-lca-tejas",
+    "slug": "lca-tejas",
+    "name": "Light Combat Aircraft (LCA) Tejas",
+    "aliases": [
+      "Tejas",
+      "LCA Tejas"
+    ],
+    "designation": "LCA Tejas",
+    "classification": {
+      "domainIds": [
+        "domain-aerospace"
+      ],
+      "categoryId": "cat-combat-aircraft",
+      "functionIds": [
+        "function-combat-aviation"
+      ],
+      "platformTypes": [
+        "fixed-wing-aircraft"
+      ]
+    },
+    "originCountryIds": [
+      "IN"
+    ],
+    "developmentCountryIds": [
+      "IN"
+    ],
+    "operatorOrganisationIds": [
+      "org-indian-air-force"
+    ],
+    "manufacturerIds": [
+      "mfr-hal"
+    ],
+    "developerOrganisationIds": [],
+    "historical": {
+      "developmentPeriod": "Contemporary Indian light-combat-aircraft programme",
+      "operationalStatus": "unknown"
+    },
+    "overview": "An Indian light combat aircraft developed under the Light Combat Aircraft programme. HAL's public product information lists Air Force and Naval variants and describes the LCA family.",
+    "historicalBackground": "The LCA programme represents a major Indian aerospace development effort. The profile covers programme identity and public product classification rather than aircraft employment.",
+    "designPhilosophy": "A light combat aircraft platform with variant development for different service contexts. No weapons employment, mission planning or flight-operating instructions are included.",
+    "generalCharacteristics": [
+      "Fixed-wing light combat aircraft.",
+      "HAL lists Air Force and Naval single-seat variants and trainer variants in its product information.",
+      "The public product portfolio identifies LCA Tejas and LCA Mk IA."
+    ],
+    "sourceIds": [
+      "src-hal-tejas"
+    ],
+    "editorial": {
+      "status": "published",
+      "confidence": "verified",
+      "lastVerified": "2026-11-04",
+      "reviewNote": "HAL's official product page supports the LCA identity and listed variant family. No detailed performance or weapons data is reproduced."
+    }
+  },
+  {
+    "id": "eqp-m1-abrams",
+    "slug": "m1-abrams",
+    "name": "M1 Abrams Main Battle Tank",
+    "aliases": [
+      "Abrams",
+      "M1 Abrams",
+      "M1A2 Abrams"
+    ],
+    "designation": "M1 Abrams family",
+    "classification": {
+      "domainIds": [
+        "domain-land"
+      ],
+      "categoryId": "cat-main-battle-tank",
+      "functionIds": [
+        "function-armoured-land-platform"
+      ],
+      "platformTypes": [
+        "tracked-land-vehicle"
+      ]
+    },
+    "originCountryIds": [
+      "US"
+    ],
+    "developmentCountryIds": [
+      "US"
+    ],
+    "operatorOrganisationIds": [
+      "org-us-army"
+    ],
+    "manufacturerIds": [],
+    "developerOrganisationIds": [],
+    "historical": {
+      "developmentPeriod": "Late twentieth-century US main battle tank programme; ongoing modernisation",
+      "operationalStatus": "active"
+    },
+    "overview": "The M1 Abrams is a United States main battle tank family. The US Army has publicly described a modernisation path that includes the M1E3 programme.",
+    "historicalBackground": "The US Army's 2023 announcement describes a revised modernisation approach for the Abrams family, including the transition toward development of the M1E3 configuration.",
+    "designPhilosophy": "A tracked armoured platform whose public modernisation discussion includes survivability, mobility, sustainment and a more modular upgrade approach.",
+    "generalCharacteristics": [
+      "Tracked main battle tank family.",
+      "The US Army identifies the Abrams as an ongoing modernisation programme.",
+      "Public modernisation themes include mobility, survivability and reduced sustainment burden."
+    ],
+    "sourceIds": [
+      "src-usarmy-m1"
+    ],
+    "editorial": {
+      "status": "published",
+      "confidence": "verified",
+      "lastVerified": "2026-11-04",
+      "reviewNote": "The record describes the public programme and platform class only. It does not present vulnerability, targeting, weapons-use or detailed performance data."
+    }
+  },
+  {
+    "id": "eqp-ddg51-arleigh-burke",
+    "slug": "ddg51-arleigh-burke-class",
+    "name": "Arleigh Burke-Class Guided-Missile Destroyer",
+    "aliases": [
+      "DDG 51 class",
+      "Arleigh Burke class",
+      "DDG-51"
+    ],
+    "designation": "DDG 51 class",
+    "classification": {
+      "domainIds": [
+        "domain-naval"
+      ],
+      "categoryId": "cat-destroyer",
+      "functionIds": [
+        "function-maritime-surface-combatant"
+      ],
+      "platformTypes": [
+        "surface-combatant"
+      ]
+    },
+    "originCountryIds": [
+      "US"
+    ],
+    "developmentCountryIds": [
+      "US"
+    ],
+    "operatorOrganisationIds": [
+      "org-us-navy"
+    ],
+    "manufacturerIds": [
+      "mfr-general-dynamics-bath",
+      "mfr-hii-ingalls"
+    ],
+    "developerOrganisationIds": [],
+    "historical": {
+      "developmentPeriod": "Late twentieth-century US naval surface-combatant programme",
+      "operationalStatus": "active"
+    },
+    "overview": "A US Navy guided-missile destroyer class. The Navy describes the class as a multi-mission surface combatant and lists multiple shipbuilders across the class.",
+    "historicalBackground": "The US Navy's DDG 51 fact file describes the class background, its place in the fleet and the shipbuilding organisations associated with its construction.",
+    "designPhilosophy": "A multi-mission surface combatant designed to operate independently or within larger naval formations. The profile avoids weapons employment, sensor tactics and combat-system operation.",
+    "generalCharacteristics": [
+      "Guided-missile destroyer class operated by the US Navy.",
+      "A multi-mission surface combatant within the US surface fleet.",
+      "The Navy lists General Dynamics Bath Iron Works and HII Ingalls Shipbuilding among the builders."
+    ],
+    "sourceIds": [
+      "src-usnavy-ddg51"
+    ],
+    "editorial": {
+      "status": "published",
+      "confidence": "verified",
+      "lastVerified": "2026-11-04",
+      "reviewNote": "US Navy fact file supports class identity, general fleet role and builder names. System-level weapon and sensor details are deliberately excluded."
+    }
+  },
+  {
+    "id": "eqp-challenger-2",
+    "slug": "challenger-2",
+    "name": "Challenger 2 Main Battle Tank",
+    "aliases": [
+      "Challenger 2",
+      "CR2"
+    ],
+    "designation": "Challenger 2",
+    "classification": {
+      "domainIds": [
+        "domain-land"
+      ],
+      "categoryId": "cat-main-battle-tank",
+      "functionIds": [
+        "function-armoured-land-platform"
+      ],
+      "platformTypes": [
+        "tracked-land-vehicle"
+      ]
+    },
+    "originCountryIds": [
+      "GB"
+    ],
+    "developmentCountryIds": [
+      "GB"
+    ],
+    "operatorOrganisationIds": [
+      "org-british-army"
+    ],
+    "manufacturerIds": [
+      "mfr-vickers-defence"
+    ],
+    "developerOrganisationIds": [],
+    "historical": {
+      "developmentPeriod": "Designed as the successor to Challenger 1; entered British Army service in the 1990s",
+      "operationalStatus": "active"
+    },
+    "overview": "The Challenger 2 is a British main battle tank developed as the successor to Challenger 1. The British Army's equipment page provides its historical and service context.",
+    "historicalBackground": "The British Army states that Challenger 2 was designed as a replacement for Challenger 1 and entered service in July 1994. The same page attributes its original construction to Vickers Defence Systems.",
+    "designPhilosophy": "A tracked armoured vehicle whose public design discussion centres on the broad relationship between protection, mobility and general vehicle capability.",
+    "generalCharacteristics": [
+      "British main battle tank developed as the successor to Challenger 1.",
+      "The British Army records entry into service in July 1994.",
+      "The Army's public equipment page attributes the original build to Vickers Defence Systems."
+    ],
+    "sourceIds": [
+      "src-british-army-challenger"
+    ],
+    "editorial": {
+      "status": "published",
+      "confidence": "verified",
+      "lastVerified": "2026-11-04",
+      "reviewNote": "The British Army source supports designation, historical context and builder attribution. Tactical employment and crew operating procedures are not included."
+    }
+  },
+  {
+    "id": "eqp-type45-daring",
+    "slug": "type-45-daring-class",
+    "name": "Daring-Class Type 45 Destroyer",
+    "aliases": [
+      "Type 45",
+      "Daring class",
+      "Type 45 destroyer"
+    ],
+    "designation": "Type 45 / Daring class",
+    "classification": {
+      "domainIds": [
+        "domain-naval"
+      ],
+      "categoryId": "cat-destroyer",
+      "functionIds": [
+        "function-maritime-surface-combatant"
+      ],
+      "platformTypes": [
+        "surface-combatant"
+      ]
+    },
+    "originCountryIds": [
+      "GB"
+    ],
+    "developmentCountryIds": [
+      "GB"
+    ],
+    "operatorOrganisationIds": [
+      "org-royal-navy"
+    ],
+    "manufacturerIds": [],
+    "developerOrganisationIds": [],
+    "historical": {
+      "developmentPeriod": "Twenty-first-century Royal Navy destroyer programme",
+      "operationalStatus": "active"
+    },
+    "overview": "The Daring class is the Royal Navy's Type 45 destroyer class. The Royal Navy describes the ships as high-technology destroyers with a multi-mission maritime role.",
+    "historicalBackground": "The Royal Navy's public equipment page identifies six ships in the Daring class and describes the class's broad place in the fleet.",
+    "designPhilosophy": "A modern surface combatant with an integrated shipboard communications environment. This profile does not describe combat-system operation or engagement procedures.",
+    "generalCharacteristics": [
+      "Royal Navy Type 45 destroyer class, also known as the Daring class.",
+      "The Royal Navy lists six ships in the class.",
+      "The official profile discusses maritime security, fleet protection and humanitarian-support contexts."
+    ],
+    "sourceIds": [
+      "src-royal-navy-type45"
+    ],
+    "editorial": {
+      "status": "published",
+      "confidence": "verified",
+      "lastVerified": "2026-11-04",
+      "reviewNote": "Royal Navy official equipment page supports class identity, fleet context and broad public description. Detailed combat-system information is excluded."
+    }
+  },
+  {
+    "id": "eqp-char-leclerc",
+    "slug": "char-leclerc",
+    "name": "Leclerc Main Battle Tank",
+    "aliases": [
+      "Leclerc",
+      "Char Leclerc"
+    ],
+    "designation": "Leclerc",
+    "classification": {
+      "domainIds": [
+        "domain-land"
+      ],
+      "categoryId": "cat-main-battle-tank",
+      "functionIds": [
+        "function-armoured-land-platform"
+      ],
+      "platformTypes": [
+        "tracked-land-vehicle"
+      ]
+    },
+    "originCountryIds": [
+      "FR"
+    ],
+    "developmentCountryIds": [
+      "FR"
+    ],
+    "operatorOrganisationIds": [
+      "org-french-army"
+    ],
+    "manufacturerIds": [
+      "mfr-nexter"
+    ],
+    "developerOrganisationIds": [],
+    "historical": {
+      "developmentPeriod": "Late twentieth-century French third-generation main battle tank programme",
+      "operationalStatus": "active"
+    },
+    "overview": "The Leclerc is a French main battle tank. The French Ministry of the Armed Forces identifies it as a third-generation combat tank and names Nexter Systems as its industrial builder.",
+    "historicalBackground": "The French Ministry's public equipment page describes the Leclerc's place in the French Army and its onboard information and communications context.",
+    "designPhilosophy": "A tracked armoured vehicle incorporating onboard computing and data transmission as part of its publicly described command-information environment.",
+    "generalCharacteristics": [
+      "French third-generation main battle tank.",
+      "The French Ministry identifies Nexter Systems as the builder.",
+      "The official description references onboard computing and data transmission."
+    ],
+    "sourceIds": [
+      "src-fr-leclerc"
+    ],
+    "editorial": {
+      "status": "published",
+      "confidence": "verified",
+      "lastVerified": "2026-11-04",
+      "reviewNote": "Official French Ministry equipment page supports broad identification and industrial attribution. No firing, targeting or detailed performance data is included."
+    }
+  },
+  {
+    "id": "eqp-caesar",
+    "slug": "caesar-self-propelled-artillery",
+    "name": "CAESAR Self-Propelled Artillery System",
+    "aliases": [
+      "CAESAR",
+      "Camion Équipé d’un Système d’Artillerie"
+    ],
+    "designation": "CAESAR",
+    "classification": {
+      "domainIds": [
+        "domain-land"
+      ],
+      "categoryId": "cat-self-propelled-artillery",
+      "functionIds": [
+        "function-mobile-artillery-system"
+      ],
+      "platformTypes": [
+        "wheeled-artillery-vehicle"
+      ]
+    },
+    "originCountryIds": [
+      "FR"
+    ],
+    "developmentCountryIds": [
+      "FR"
+    ],
+    "operatorOrganisationIds": [
+      "org-french-army"
+    ],
+    "manufacturerIds": [
+      "mfr-knds-france"
+    ],
+    "developerOrganisationIds": [],
+    "historical": {
+      "developmentPeriod": "Contemporary French wheeled artillery programme",
+      "operationalStatus": "active"
+    },
+    "overview": "CAESAR is a French truck-mounted artillery system. The French Ministry of the Armed Forces expands its name as Camion Équipé d’un Système d’Artillerie and identifies KNDS France as the industrial supplier.",
+    "historicalBackground": "The French Ministry's 2024 announcement describes a joint acquisition arrangement involving France, Croatia and Estonia and identifies KNDS France as the industrial supplier.",
+    "designPhilosophy": "A wheeled, truck-mounted artillery platform designed around mobility and transportability at a general system level. No firing calculations, targeting procedures or ammunition guidance are provided.",
+    "generalCharacteristics": [
+      "Truck-mounted, wheeled self-propelled artillery system.",
+      "The name expands to Camion Équipé d’un Système d’Artillerie.",
+      "The French Ministry identifies KNDS France as the industrial supplier."
+    ],
+    "sourceIds": [
+      "src-fr-caesar"
+    ],
+    "editorial": {
+      "status": "published",
+      "confidence": "verified",
+      "lastVerified": "2026-11-04",
+      "reviewNote": "The French Ministry source supports system identity and industrial attribution. Artillery employment, firing data, ammunition and targeting details are intentionally omitted."
+    }
+  },
+  {
+    "id": "eqp-mogami-class",
+    "slug": "mogami-class-frigate",
+    "name": "Mogami-Class Multi-Mission Frigate",
+    "aliases": [
+      "Mogami class",
+      "FFM"
+    ],
+    "designation": "Mogami-class FFM",
+    "classification": {
+      "domainIds": [
+        "domain-naval"
+      ],
+      "categoryId": "cat-frigate",
+      "functionIds": [
+        "function-maritime-surface-combatant"
+      ],
+      "platformTypes": [
+        "surface-combatant"
+      ]
+    },
+    "originCountryIds": [
+      "JP"
+    ],
+    "developmentCountryIds": [
+      "JP"
+    ],
+    "operatorOrganisationIds": [
+      "org-jmsdf"
+    ],
+    "manufacturerIds": [],
+    "developerOrganisationIds": [],
+    "historical": {
+      "developmentPeriod": "Twenty-first-century Japan Maritime Self-Defense Force frigate programme",
+      "operationalStatus": "active"
+    },
+    "overview": "The Mogami class is a Japanese Maritime Self-Defense Force surface-ship class. The JMSDF's official equipment directory lists Mogami-class ships under the FFM designation.",
+    "historicalBackground": "The JMSDF public equipment directory provides a current class and ship listing, offering a primary reference for identification and nomenclature.",
+    "designPhilosophy": "A modern surface vessel class. This educational record is limited to public identification, fleet context and high-level classification.",
+    "generalCharacteristics": [
+      "Listed by the Japan Maritime Self-Defense Force under the FFM symbol.",
+      "The public directory lists multiple ships in the Mogami class.",
+      "A surface combatant class; shipboard operating procedures are not covered."
+    ],
+    "sourceIds": [
+      "src-jmsdf-mogami"
+    ],
+    "editorial": {
+      "status": "published",
+      "confidence": "verified",
+      "lastVerified": "2026-11-04",
+      "reviewNote": "JMSDF official equipment directory supports class nomenclature and public listing. No tactical or combat-system detail is reproduced."
+    }
+  },
+  {
+    "id": "eqp-type10",
+    "slug": "type-10-main-battle-tank",
+    "name": "Type 10 Main Battle Tank",
+    "aliases": [
+      "Type-10",
+      "TK-X",
+      "Type 10 tank"
+    ],
+    "designation": "Type 10",
+    "classification": {
+      "domainIds": [
+        "domain-land"
+      ],
+      "categoryId": "cat-main-battle-tank",
+      "functionIds": [
+        "function-armoured-land-platform"
+      ],
+      "platformTypes": [
+        "tracked-land-vehicle"
+      ]
+    },
+    "originCountryIds": [
+      "JP"
+    ],
+    "developmentCountryIds": [
+      "JP"
+    ],
+    "operatorOrganisationIds": [
+      "org-jgsdf"
+    ],
+    "manufacturerIds": [
+      "mfr-mitsubishi-heavy",
+      "mfr-japan-steel-works"
+    ],
+    "developerOrganisationIds": [],
+    "historical": {
+      "developmentPeriod": "Twenty-first-century Japanese main battle tank programme",
+      "operationalStatus": "unknown"
+    },
+    "overview": "The Type 10 is a Japanese main battle tank identified in a Ministry of Defense technical handout for Ground Self-Defense Force equipment. The document also identifies industrial participants for the platform and a major component.",
+    "historicalBackground": "Japan's Acquisition, Technology & Logistics Agency public handout identifies the Type 10 as a Ground Self-Defense Force main battle tank and lists Mitsubishi Heavy Industries and Japan Steel Works in the manufacturer information.",
+    "designPhilosophy": "A tracked armoured vehicle with publicly documented information-sharing features. This summary does not cover internal mechanisms, operational procedures or performance optimisation.",
+    "generalCharacteristics": [
+      "Main battle tank listed in an official Japanese Ground Self-Defense Force equipment handout.",
+      "The public document identifies Mitsubishi Heavy Industries and Japan Steel Works in the manufacturing information.",
+      "The source describes an onboard information-sharing capability at a high level."
+    ],
+    "sourceIds": [
+      "src-japan-atla-type10"
+    ],
+    "editorial": {
+      "status": "published",
+      "confidence": "verified",
+      "lastVerified": "2026-11-04",
+      "reviewNote": "The 2018 Japanese Ministry of Defense handout supports identification and manufacturing attribution, but this sample does not use that older document alone to assert current service status. No operational detail is reproduced."
+    }
+  },
+  {
+    "id": "eqp-m4a1-carbine",
+    "slug": "m4a1-carbine",
+    "name": "M4A1 Carbine",
+    "aliases": [
+      "M4A1",
+      "M4 Carbine family"
+    ],
+    "designation": "M4A1",
+    "classification": {
+      "domainIds": [
+        "domain-infantry"
+      ],
+      "categoryId": "cat-individual-carbine",
+      "functionIds": [
+        "function-infantry-individual-equipment"
+      ],
+      "platformTypes": [
+        "individual-small-arm"
+      ]
+    },
+    "originCountryIds": [
+      "US"
+    ],
+    "developmentCountryIds": [
+      "US"
+    ],
+    "operatorOrganisationIds": [
+      "org-us-army"
+    ],
+    "manufacturerIds": [],
+    "developerOrganisationIds": [],
+    "historical": {
+      "developmentPeriod": "Modern U.S. service-carbine family; subsequent force-element transition to newer equipment announced in 2026",
+      "operationalStatus": "unknown"
+    },
+    "overview": "The M4A1 is an individual carbine in the U.S. Army's M4 family. This profile provides identification and broad institutional context only. Public transition reporting in 2026 indicates that equipment replacement is underway for at least one force element, so this sample does not make a blanket current-service claim.",
+    "historicalBackground": "The U.S. Army maintains an official M4A1 equipment portfolio page. In April 2026, the Army announced an XM8 carbine delivery order and described a transition for its Close Combat Force. These public sources show why equipment status should be qualified by organisation and date rather than treated as a timeless binary.",
+    "designPhilosophy": "A compact individual infantry-carbine category within the M4 family. This educational summary deliberately excludes operation, internal mechanisms, firing information, accessories, performance, maintenance and modification.",
+    "generalCharacteristics": [
+      "An individual carbine associated with the U.S. Army's M4 equipment family.",
+      "The U.S. Army maintains a dedicated public M4A1 equipment portfolio entry.",
+      "A 2026 U.S. Army announcement describes an XM8 transition for the Close Combat Force; this profile therefore does not infer universal or current M4A1 operator status."
+    ],
+    "sourceIds": [
+      "src-usarmy-m4a1",
+      "src-usarmy-xm8-transition"
+    ],
+    "editorial": {
+      "status": "published",
+      "confidence": "verified",
+      "lastVerified": "2026-11-04",
+      "reviewNote": "Official U.S. Army equipment and transition pages support the broad identification and qualify service-status wording. Operational technical characteristics and procedures are excluded."
+    }
+  }
+]

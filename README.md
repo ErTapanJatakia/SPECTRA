@@ -64,11 +64,11 @@ The taxonomy is intended to support multiple discovery paths, including country,
 
 ## Curated knowledge-base sample
 
-The first knowledge-base release contains **five country profiles and ten source-attributed equipment records** spanning India, the United States, the United Kingdom, France and Japan. The sample demonstrates multidimensional classification across land, aerospace and naval systems; it is not an exhaustive national inventory or a ranking of military capability.
+The first knowledge-base release contains **five country profiles and eleven source-attributed equipment records** spanning India, the United States, the United Kingdom, France and Japan. The sample demonstrates multidimensional classification across land, aerospace and naval systems; it is not an exhaustive national inventory or a ranking of military capability.
 
 Country records use ISO 3166-1 alpha-2 and alpha-3 identifiers. Equipment records keep origin, development, operator, manufacturer and developer relationships separate. A missing relationship is not inferred.
 
-The starter collection includes examples such as the Arjun MBT Mk IA, LCA Tejas, M1 Abrams, DDG 51 Arleigh Burke class, Challenger 2, Type 45 Daring class, Leclerc, CAESAR, Mogami class and Type 10. Their profiles are limited to identification, historical context, broad platform classification and general educational characteristics.
+The starter collection includes examples such as the Arjun MBT Mk IA, LCA Tejas, M4A1 Carbine, M1 Abrams, DDG 51 Arleigh Burke class, Challenger 2, Type 45 Daring class, Leclerc, CAESAR, Mogami class and Type 10. The M4A1 entry notes the U.S. Army's 2026 XM8 transition context and does not imply universal current service status. Their profiles are limited to identification, historical context, broad platform classification and general educational characteristics.
 
 ### Catalogue functionality
 
@@ -193,7 +193,7 @@ The repository includes original concept illustrations prepared for SPECTRA:
 | 00 | Project charter and governance | Charter established |
 | 01 | Architecture and product blueprint | Completed |
 | 02 | Repository foundation and design system | Implemented; CI passed |
-| 03 | Military systems knowledge base | Implemented; curated sample and validator committed |
+| 03 | Military systems knowledge base | Implemented; five-country, eleven-record sample and validator committed |
 | 04 | Interactive 3D Studio | Not started |
 | 05 | Learning Academy | Not started |
 | 06 | Peacekeeping education | Not started |

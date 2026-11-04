@@ -1,0 +1,32 @@
+[
+  {
+    "id": "cat-main-battle-tank",
+    "label": "Main battle tank",
+    "domainId": "domain-land"
+  },
+  {
+    "id": "cat-combat-aircraft",
+    "label": "Combat aircraft",
+    "domainId": "domain-aerospace"
+  },
+  {
+    "id": "cat-destroyer",
+    "label": "Destroyer",
+    "domainId": "domain-naval"
+  },
+  {
+    "id": "cat-frigate",
+    "label": "Frigate",
+    "domainId": "domain-naval"
+  },
+  {
+    "id": "cat-self-propelled-artillery",
+    "label": "Self-propelled artillery",
+    "domainId": "domain-land"
+  },
+  {
+    "id": "cat-individual-carbine",
+    "label": "Individual carbine",
+    "domainId": "domain-infantry"
+  }
+]

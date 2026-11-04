@@ -1,0 +1,107 @@
+[
+  {
+    "id": "mfr-hal",
+    "name": "Hindustan Aeronautics Limited (HAL)",
+    "countryIds": [
+      "IN"
+    ],
+    "roles": [
+      "manufacturer",
+      "integrator"
+    ],
+    "sourceIds": [
+      "src-hal-tejas"
+    ]
+  },
+  {
+    "id": "mfr-general-dynamics-bath",
+    "name": "General Dynamics Bath Iron Works",
+    "countryIds": [
+      "US"
+    ],
+    "roles": [
+      "shipbuilder"
+    ],
+    "sourceIds": [
+      "src-usnavy-ddg51"
+    ]
+  },
+  {
+    "id": "mfr-hii-ingalls",
+    "name": "HII Ingalls Shipbuilding",
+    "countryIds": [
+      "US"
+    ],
+    "roles": [
+      "shipbuilder"
+    ],
+    "sourceIds": [
+      "src-usnavy-ddg51"
+    ]
+  },
+  {
+    "id": "mfr-vickers-defence",
+    "name": "Vickers Defence Systems (historical builder attribution)",
+    "countryIds": [
+      "GB"
+    ],
+    "roles": [
+      "historical_builder"
+    ],
+    "sourceIds": [
+      "src-british-army-challenger"
+    ]
+  },
+  {
+    "id": "mfr-nexter",
+    "name": "Nexter Systems",
+    "countryIds": [
+      "FR"
+    ],
+    "roles": [
+      "manufacturer"
+    ],
+    "sourceIds": [
+      "src-fr-leclerc"
+    ]
+  },
+  {
+    "id": "mfr-knds-france",
+    "name": "KNDS France",
+    "countryIds": [
+      "FR"
+    ],
+    "roles": [
+      "manufacturer"
+    ],
+    "sourceIds": [
+      "src-fr-caesar"
+    ]
+  },
+  {
+    "id": "mfr-mitsubishi-heavy",
+    "name": "Mitsubishi Heavy Industries",
+    "countryIds": [
+      "JP"
+    ],
+    "roles": [
+      "manufacturer"
+    ],
+    "sourceIds": [
+      "src-japan-atla-type10"
+    ]
+  },
+  {
+    "id": "mfr-japan-steel-works",
+    "name": "The Japan Steel Works",
+    "countryIds": [
+      "JP"
+    ],
+    "roles": [
+      "component_supplier"
+    ],
+    "sourceIds": [
+      "src-japan-atla-type10"
+    ]
+  }
+]
