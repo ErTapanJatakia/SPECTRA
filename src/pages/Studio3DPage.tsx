@@ -357,7 +357,7 @@ function SelectionOutline({ root, selectedNodeId }: { root: THREE.Object3D; sele
   return null;
 }
 
-function ImportedModel({ url, selectedNodeId, onHierarchyChange, cameraCommand }: {
+function ImportedModel({ url, selectedNodeId, onHierarchyChange }: {
   url: string; selectedNodeId: string; onHierarchyChange: (nodes: ModelNodeSnapshot[]) => void;
 }) {
   const { scene } = useGLTF(url);
@@ -413,12 +413,13 @@ function PerformanceSampler({ onSample }: { onSample: (sample: PerformanceSample
   return null;
 }
 
-function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark, dpr, reducedMotion, onPerformanceSample, selectedNodeId, onHierarchyChange }: {
+function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark, dpr, reducedMotion, onPerformanceSample, selectedNodeId, onHierarchyChange, cameraCommand }: {
   modelUrl: string | null; showAnnotations: boolean; selectedAnnotation: string;
   onSelect: (id: string) => void; resetKey: number; dark: boolean; dpr: number; reducedMotion: boolean;
   onPerformanceSample: (sample: PerformanceSample) => void; selectedNodeId: string;
-  onHierarchyChange: (nodes: ModelNodeSnapshot[]) => void;
+  onHierarchyChange: (nodes: ModelNodeSnapshot[]) => void; cameraCommand: ViewCommand | null;
 }) {
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextCleanupRef = useRef<(() => void) | null>(null);
   const [contextLost, setContextLost] = useState(false);
@@ -460,7 +461,8 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
         </ModelErrorBoundary>
       </Suspense>
       <PerformanceSampler onSample={onPerformanceSample} />
-      <OrbitControls key={resetKey} makeDefault enableDamping={!reducedMotion} dampingFactor={reducedMotion ? 0 : 0.08} minDistance={2} maxDistance={18} />
+      <OrbitControls ref={controlsRef} key={resetKey} makeDefault enableDamping={!reducedMotion} dampingFactor={reducedMotion ? 0 : 0.08} minDistance={2} maxDistance={18} />
+      <ViewportCameraController command={cameraCommand} controlsRef={controlsRef} />
     </Canvas>
     {contextLost && <div className="studio-canvas-error" role="alert">The WebGL context was lost. The viewer will resume if the browser restores graphics access; otherwise reload the page or use the text-based model notes.</div>}
     </>
@@ -485,7 +487,10 @@ export default function Studio3DPage() {
   const [annotationDetail, setAnnotationDetail] = useState("");
   const [annotationError, setAnnotationError] = useState("");
   const [showAnnotations, setShowAnnotations] = useState(true);
-  const [resetKey, setResetKey] = useState(0);\n  const [cameraCommand, setCameraCommand] = useState<ViewCommand | null>(null);\n  const cameraCommandSequence = useRef(0);\n  const [measurementStartId, setMeasurementStartId] = useState("");
+  const [resetKey, setResetKey] = useState(0);
+  const [cameraCommand, setCameraCommand] = useState<ViewCommand | null>(null);
+  const cameraCommandSequence = useRef(0);
+  const [measurementStartId, setMeasurementStartId] = useState("");
   const [dark, setDark] = useState(true);
   const [performance, setPerformance] = useState<PerformanceSample>({ fps: 0, geometries: 0, textures: 0, drawCalls: 0 });
   const [renderDpr, setRenderDpr] = useState(1.25);
@@ -513,7 +518,11 @@ export default function Studio3DPage() {
       return true;
     }).slice(0, 200);
   }, [modelNodes, nodeSearch, collapsedNodeIds]);
-  const selectedModelNode = modelNodes.find((node) => node.id === selectedNodeId);\n  const measurementStartNode = modelNodes.find((node) => node.id === measurementStartId);\n  const requestCameraView = (preset: CameraPreset | "fit", target: [number, number, number] = [0, 0, 0]) => {\n    setCameraCommand({ id: ++cameraCommandSequence.current, preset, target });\n  };
+  const selectedModelNode = modelNodes.find((node) => node.id === selectedNodeId);
+  const measurementStartNode = modelNodes.find((node) => node.id === measurementStartId);
+  const requestCameraView = (preset: CameraPreset | "fit", target: [number, number, number] = [0, 0, 0]) => {
+    setCameraCommand({ id: ++cameraCommandSequence.current, preset, target });
+  };
 
   const handlePerformanceSample = useCallback((sample: PerformanceSample) => {
     setPerformance(sample);
@@ -657,7 +666,9 @@ export default function Studio3DPage() {
             {selectedModelNode && <div className="studio-node-properties" aria-live="polite">
               <strong>Selected object · {selectedModelNode.type}</strong>
               <span>Name: {selectedModelNode.name}</span>
-              <span>Local position: {selectedModelNode.position.map((value) => value.toFixed(3)).join(", ")}</span>\n              <span>World position: {selectedModelNode.worldPosition.map((value) => value.toFixed(3)).join(", ")}</span>\n              {selectedModelNode.boundsSize && <span>World bounds (W × H × D): {selectedModelNode.boundsSize.map((value) => value.toFixed(3)).join(" × ")}</span>}
+              <span>Local position: {selectedModelNode.position.map((value) => value.toFixed(3)).join(", ")}</span>
+              <span>World position: {selectedModelNode.worldPosition.map((value) => value.toFixed(3)).join(", ")}</span>
+              {selectedModelNode.boundsSize && <span>World bounds (W × H × D): {selectedModelNode.boundsSize.map((value) => value.toFixed(3)).join(" × ")}</span>}
               <span>Rotation: {selectedModelNode.rotation.map((value) => value.toFixed(3)).join(", ")}</span>
               <span>Scale: {selectedModelNode.scale.map((value) => value.toFixed(3)).join(", ")}</span>
               <span>Visible: {selectedModelNode.visible ? "Yes" : "No"}</span>
@@ -667,6 +678,11 @@ export default function Studio3DPage() {
                 <span>Indices: {selectedModelNode.indexCount?.toLocaleString("en-US")}</span>
                 <span>Materials: {selectedModelNode.materials?.join(", ") || "None"}</span>
               </>}
+              <div className="studio-measurement-tools">
+                <button type="button" className="studio-tool-button" onClick={() => setMeasurementStartId(selectedModelNode.id)}>Set measurement start</button>
+                {measurementStartNode && <button type="button" className="studio-clear-button" onClick={() => setMeasurementStartId("")}>Clear start point</button>}
+                {measurementStartNode && <span role="status">{measurementStartNode.id === selectedModelNode.id ? "Start point: " + measurementStartNode.name : "Distance from " + measurementStartNode.name + ": " + formatDistance(distanceBetweenPoints(measurementStartNode.worldPosition, selectedModelNode.worldPosition))}</span>}
+              </div>
             </div>}
           </section>}
           <section className="studio-panel-section">
