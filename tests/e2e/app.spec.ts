@@ -401,7 +401,7 @@ test("3D Studio exposes a searchable hierarchy and read-only object properties f
   await expect(rootNode).toBeVisible();
   await rootNode.click();
   await expect(page.getByText("Selected object · Group")).toBeVisible();
-  await expect(page.getByText(/Position: 0\.000, 0\.000, 0\.000/)).toBeVisible();
+  await expect(page.getByText(/Local position: 0\.000, 0\.000, 0\.000/)).toBeVisible();
   await page.getByLabel("Search objects").fill("no-such-object");
   await expect(page.getByText("No matching scene objects.")).toBeVisible();
   await page.getByLabel("Search objects").fill("Group");
@@ -473,10 +473,10 @@ test("3D Studio camera presets, world-space inspection and point distance measur
   await page.getByRole("button", { name: "Top view" }).click();
   await page.getByRole("button", { name: "Isometric view" }).click();
   await page.getByRole("button", { name: /Reference A/ }).click();
-  await expect(page.getByText(/World position: 3\\.000, 2\\.000, 3\\.000/)).toBeVisible();
+  await expect(page.getByText(/World position: 3\.000, 2\.000, 3\.000/)).toBeVisible();
   await page.getByRole("button", { name: "Set measurement start" }).click();
   await page.getByRole("button", { name: /Reference B/ }).click();
-  await expect(page.getByText(/Distance from Reference A: 4\\.000 m/)).toBeVisible();
+  await expect(page.getByText(/Distance from Reference A: 4\.000 m/)).toBeVisible();
   await page.getByRole("button", { name: "Focus selected" }).click();
   await page.getByRole("button", { name: "Fit scene" }).click();
 });
