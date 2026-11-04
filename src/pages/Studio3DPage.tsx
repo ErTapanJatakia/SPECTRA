@@ -362,9 +362,9 @@ function PerformanceSampler({ onSample }: { onSample: (sample: PerformanceSample
   return null;
 }
 
-function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark, dpr, onPerformanceSample }: {
+function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark, dpr, reducedMotion, onPerformanceSample }: {
   modelUrl: string | null; showAnnotations: boolean; selectedAnnotation: string;
-  onSelect: (id: string) => void; resetKey: number; dark: boolean; dpr: number;
+  onSelect: (id: string) => void; resetKey: number; dark: boolean; dpr: number; reducedMotion: boolean;
   onPerformanceSample: (sample: PerformanceSample) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -496,7 +496,7 @@ export default function Studio3DPage() {
           <div className="studio-canvas-wrap">
             <p id="studio-viewport-instructions" className="studio-sr-only">The 3D viewport is keyboard focusable. Use the Reset view button to restore the default view. Annotation controls are available in the Explore features panel. The viewport also supports pointer and touch navigation.</p>
             <Scene modelUrl={modelUrl} showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation}
-              onSelect={setSelectedAnnotation} resetKey={resetKey} dark={dark} dpr={renderDpr} onPerformanceSample={handlePerformanceSample} />
+              onSelect={setSelectedAnnotation} resetKey={resetKey} dark={dark} dpr={renderDpr} reducedMotion={reducedMotion} onPerformanceSample={handlePerformanceSample} />
             <div className="studio-viewer-hint"><span>DRAG · ORBIT</span><span>SCROLL · ZOOM</span><span>RIGHT-DRAG · PAN</span></div>
           </div>
           <div className="studio-viewer-caption"><span><i className="studio-status-dot" /> Browser-local rendering</span><span>No model is uploaded to SPECTRA servers</span></div>
