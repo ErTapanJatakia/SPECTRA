@@ -50,7 +50,7 @@ function parseGlbDocument(bytes: ArrayBuffer): Record<string, unknown> {
     if (chunkType === 0x4e4f534a) {
       if (jsonDocument) throw new Error("The GLB must contain exactly one JSON chunk.");
       const jsonText = new TextDecoder("utf-8", { fatal: true })
-        .decode(new Uint8Array(bytes, chunkStart, chunkLength)).replace(/\\s+$/g, "");
+        .decode(new Uint8Array(bytes, chunkStart, chunkLength)).replace(/\s+$/g, "");
       jsonDocument = parseModelDocument(jsonText);
     } else if (chunkType === 0x004e4942) {
       binaryChunkCount += 1;
@@ -96,7 +96,7 @@ async function validateModelFile(file: File, extension: string): Promise<void> {
         throw new Error("External model resources are blocked. Use a self-contained GLB or embedded data URIs.");
       }
       const allowedDataUri = collectionName === "buffers"
-        ? /^data:application\\/(?:octet-stream|gltf-buffer);base64,/i
+        ? /^data:application\/(?:octet-stream|gltf-buffer);base64,/i
         : /^data:image\\/(?:png|jpeg|webp);base64,/i;
       if (!allowedDataUri.test(uri)) {
         throw new Error(`The embedded ${collectionName === "images" ? "image" : "buffer"} data URI uses an unsupported or unsafe format.`);
