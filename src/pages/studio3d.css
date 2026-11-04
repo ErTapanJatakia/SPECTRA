@@ -72,3 +72,17 @@
 @media (prefers-reduced-motion: reduce) {
   .studio-page *, .studio-page *::before, .studio-page *::after { scroll-behavior:auto !important; animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
 }
+
+/* Imported model hierarchy and read-only object inspector */
+.studio-inspector > label { display:flex; flex-direction:column; gap:5px; color:var(--muted); font-size:9px; font-weight:700; }
+.studio-inspector input[type="search"] { width:100%; min-width:0; min-height:34px; padding:7px 9px; border:1px solid var(--border); border-radius:7px; color:var(--text); background:var(--surface-2); font:inherit; }
+.studio-node-tree { display:flex; flex-direction:column; gap:3px; max-height:280px; overflow:auto; padding:4px; border:1px solid var(--border); border-radius:8px; background:var(--surface-2); }
+.studio-node-item { display:flex; align-items:center; gap:7px; width:100%; min-width:0; min-height:30px; padding:5px 8px; border:1px solid transparent; border-radius:5px; color:var(--muted); background:transparent; text-align:left; cursor:pointer; }
+.studio-node-item > span { color:var(--accent); font-size:11px; }
+.studio-node-item strong { min-width:0; overflow:hidden; color:var(--text); font-size:9px; text-overflow:ellipsis; white-space:nowrap; }
+.studio-node-item small { margin-left:auto; color:var(--subtle); font-size:8px; }
+.studio-node-item:hover,.studio-node-active { border-color:var(--border-strong); background:var(--accent-soft); }
+.studio-node-properties { display:flex; flex-direction:column; gap:5px; padding:10px; border:1px solid var(--border); border-radius:8px; background:var(--surface-2); overflow-wrap:anywhere; }
+.studio-node-properties strong { color:var(--text); font-size:10px; }
+.studio-node-properties span,.studio-inspector-empty { color:var(--muted); font-size:9px; line-height:1.5; }
+.studio-inspector-empty { margin:0; padding:7px; }
