@@ -469,6 +469,9 @@ test("3D Studio camera presets, world-space inspection and point distance measur
     mimeType: "model/gltf+json",
     buffer: Buffer.from(JSON.stringify(model))
   });
+  // Wait for the asynchronous GLTF loader and hierarchy snapshot before interacting
+  // with camera controls; the preset toolbar is visible while the model is still loading.
+  await expect(page.getByRole("button", { name: /Reference A/ })).toBeVisible();
   await expect(page.getByRole("button", { name: "Front view" })).toBeVisible();
   await page.getByRole("button", { name: "Top view" }).click();
   await page.getByRole("button", { name: "Isometric view" }).click();
