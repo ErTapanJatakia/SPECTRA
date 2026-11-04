@@ -2,7 +2,6 @@ import { Component, Suspense, useEffect, useMemo, useState } from "react";
 import type { ErrorInfo, ReactNode } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Html, OrbitControls, useGLTF } from "@react-three/drei";
-import * as THREE from "three";
 import PageHeading from "../components/PageHeading";
 import Icon from "../components/Icon";
 import "./studio3d.css";
@@ -21,7 +20,7 @@ async function validateModelFile(file: File, extension: string): Promise<void> {
     const jsonLength = view.getUint32(12, true);
     const jsonType = view.getUint32(16, true);
     if (jsonType !== 0x4e4f534a || jsonLength > bytes.byteLength - 20) throw new Error("The GLB JSON chunk is invalid.");
-    document = JSON.parse(new TextDecoder().decode(new Uint8Array(bytes, 20, jsonLength)).replace(/\\u0000+$/g, "").trim()) as Record<string, unknown>;
+    document = JSON.parse(new TextDecoder().decode(new Uint8Array(bytes, 20, jsonLength)).replace(/\u0000+$/g, "").trim()) as Record<string, unknown>;
   } else {
     document = JSON.parse(await file.text()) as Record<string, unknown>;
   }
