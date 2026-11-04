@@ -100,7 +100,7 @@ async function validateModelFile(file: File, extension: string): Promise<void> {
     if (result.length > maximum) throw new Error(`The model contains too many ${name} (maximum ${maximum.toLocaleString("en-US")}).`);
     return result;
   };
-  const nodes = array("nodes", MAX_NODES);
+  array("nodes", MAX_NODES);
   const meshes = array("meshes", MAX_MESHES);
   const accessors = array("accessors", MAX_ACCESSORS);
   const bufferViews = array("bufferViews", MAX_BUFFER_VIEWS);
