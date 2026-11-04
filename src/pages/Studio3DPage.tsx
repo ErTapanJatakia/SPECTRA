@@ -145,12 +145,13 @@ async function validateModelFile(file: File, extension: string): Promise<void> {
       if (!match) throw new Error("Buffers must use embedded base64 application/octet-stream or model/gltf-buffer data.");
       const encoded = match[1];
       const decodedBytes = Math.floor(encoded.length * 3 / 4) - (encoded.endsWith("==") ? 2 : encoded.endsWith("=") ? 1 : 0);
+      if (decodedBytes !== item.byteLength) throw new Error("An embedded buffer length does not match its declared byteLength.");
       if (decodedBytes > MAX_TOTAL_BUFFER_BYTES) throw new Error("An embedded buffer exceeds the 20 MB decoded-data budget.");
     }
   }
   if (extension === ".glb" && buffers.length > 0) {
     const declaredLength = (buffers[0] as { byteLength?: number }).byteLength ?? 0;
-    if (!binaryChunk || declaredLength > binaryChunk.byteLength || declaredLength > MAX_TOTAL_BUFFER_BYTES) {
+    if (!binaryChunk || declaredLength > binaryChunk.byteLength || binaryChunk.byteLength - declaredLength > 3 || declaredLength > MAX_TOTAL_BUFFER_BYTES) {
       throw new Error("The GLB binary buffer is missing or exceeds the permitted decoded-data budget.");
     }
   }
@@ -202,13 +203,16 @@ async function validateModelFile(file: File, extension: string): Promise<void> {
     }
   };
 
+  let totalEmbeddedImageBytes = 0;
   for (const image of images) {
     if (!image || typeof image !== "object" || Array.isArray(image)) throw new Error("The model contains an invalid image entry.");
     const item = image as { uri?: unknown; bufferView?: unknown; mimeType?: unknown };
     if (item.uri !== undefined) {
       if (typeof item.uri !== "string" || !/^data:image\/(?:png|jpeg|webp);base64,/i.test(item.uri)) throw new Error("Images must be embedded base64 PNG, JPEG or WebP data; external resources are blocked.");
       const payload = item.uri.slice(item.uri.indexOf(",") + 1);
-      if (payload.length > 34_952_536) throw new Error("An embedded image exceeds the 25 MB resource limit.");
+      const decodedImageBytes = Math.floor(payload.length * 3 / 4) - (payload.endsWith("==") ? 2 : payload.endsWith("=") ? 1 : 0);
+      totalEmbeddedImageBytes += decodedImageBytes;
+      if (totalEmbeddedImageBytes > MAX_TOTAL_BUFFER_BYTES) throw new Error("Embedded images exceed the 20 MB aggregate resource budget.");
       try {
         const decoded = atob(payload.slice(0, 87384));
         enforceImageDimensions(Uint8Array.from(decoded, (character) => character.charCodeAt(0)));
