@@ -97,7 +97,7 @@ async function validateModelFile(file: File, extension: string): Promise<void> {
       }
       const allowedDataUri = collectionName === "buffers"
         ? /^data:application\/(?:octet-stream|gltf-buffer);base64,/i
-        : /^data:image\\/(?:png|jpeg|webp);base64,/i;
+        : /^data:image\/(?:png|jpeg|webp);base64,/i;
       if (!allowedDataUri.test(uri)) {
         throw new Error(`The embedded ${collectionName === "images" ? "image" : "buffer"} data URI uses an unsupported or unsafe format.`);
       }
