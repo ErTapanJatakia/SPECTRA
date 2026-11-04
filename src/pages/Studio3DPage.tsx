@@ -100,7 +100,7 @@ async function validateModelFile(file: File, extension: string): Promise<void> {
     if (result.length > maximum) throw new Error(`The model contains too many ${name} (maximum ${maximum.toLocaleString("en-US")}).`);
     return result;
   };
-  array("nodes", MAX_NODES);
+  void array("nodes", MAX_NODES);
   const meshes = array("meshes", MAX_MESHES);
   const accessors = array("accessors", MAX_ACCESSORS);
   const bufferViews = array("bufferViews", MAX_BUFFER_VIEWS);
@@ -219,7 +219,7 @@ async function validateModelFile(file: File, extension: string): Promise<void> {
       } catch (error) {
         if (error instanceof Error && error.message.startsWith("Images are limited")) throw error;
         if (error instanceof Error && error.message.startsWith("An embedded image")) throw error;
-        throw new Error("An embedded image contains invalid base64 data.");
+        throw new Error("An embedded image contains invalid base64 data.", { cause: error });
       }
     } else if (item.bufferView !== undefined) {
       if (!Number.isSafeInteger(item.bufferView) || (item.bufferView as number) < 0 || (item.bufferView as number) >= bufferViews.length ||
