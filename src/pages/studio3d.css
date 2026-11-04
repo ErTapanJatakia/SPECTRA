@@ -93,3 +93,8 @@
 .studio-model-annotation { display:flex; flex-direction:column; gap:5px; padding:8px; border:1px solid var(--border); border-radius:8px; background:var(--surface-2); }
 .studio-model-annotation > p { margin:0; color:var(--muted); font-size:9px; line-height:1.6; overflow-wrap:anywhere; }
 .studio-model-annotation .studio-clear-button { min-height:26px; padding:4px 7px; font-size:8px; }
+
+.studio-node-row { display:flex; align-items:center; gap:3px; min-width:0; }
+.studio-node-toggle,.studio-node-toggle-placeholder { display:inline-flex; flex:0 0 20px; align-items:center; justify-content:center; width:20px; height:28px; border:0; border-radius:4px; color:var(--accent); background:transparent; font-size:11px; cursor:pointer; }
+.studio-node-toggle:hover { background:var(--accent-soft); }
+.studio-node-row .studio-node-item { flex:1; width:auto; padding-left:6px; }
