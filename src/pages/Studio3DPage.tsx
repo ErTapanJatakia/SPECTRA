@@ -445,6 +445,7 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
 export default function Studio3DPage() {
   const [modelUrl, setModelUrl] = useState<string | null>(null);
   const importRequestRef = useRef(0);
+  const annotationSequenceRef = useRef(0);
   const [modelName, setModelName] = useState("SPECTRA illustrative reference model");
   const [sourceNote, setSourceNote] = useState("Original geometric demonstration asset");
   const [licenceNote, setLicenceNote] = useState("SPECTRA demo geometry — original");
@@ -539,7 +540,7 @@ export default function Studio3DPage() {
     if (!title || !detail) { setAnnotationError("Enter both an annotation title and explanation."); return; }
     if (title.length > 80 || detail.length > 400) { setAnnotationError("Titles are limited to 80 characters and explanations to 400 characters."); return; }
     setModelAnnotations((current) => [...current, {
-      id: `annotation-${current.length + 1}-${selectedModelNode.id}`,
+      id: `annotation-${++annotationSequenceRef.current}`,
       nodeId: selectedModelNode.id,
       title,
       detail
