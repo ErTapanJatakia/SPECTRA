@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Component, Suspense, useEffect, useMemo, useState } from "react";
 import type { ErrorInfo, ReactNode } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Html, OrbitControls, useGLTF } from "@react-three/drei";
@@ -18,7 +18,7 @@ const annotations: Annotation[] = [
   { id: "03", title: "Support assembly", detail: "A generic supporting structure included for spatial orientation.", position: [-0.9, -0.35, 0.1] }
 ];
 
-class ModelErrorBoundary extends React.Component<{ children: ReactNode }, { failed: boolean }> {
+class ModelErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(error: Error, info: ErrorInfo) { console.warn("SPECTRA model viewer could not render this asset.", error, info); }
@@ -132,8 +132,8 @@ export default function Studio3DPage() {
           <div className="studio-toolbar">
             <div><span className="eyebrow">INTERACTIVE VIEWPORT</span><strong>{modelUrl ? "LOCAL MODEL" : "DEMONSTRATION SCENE"}</strong></div>
             <div className="studio-toolbar-actions">
-              <button className="studio-tool-button" onClick={() => setShowAnnotations((value) => !value)} aria-pressed={showAnnotations}><Icon name="map-pin" size={15} /> {showAnnotations ? "Hide labels" : "Show labels"}</button>
-              <button className="studio-tool-button" onClick={() => setResetKey((value) => value + 1)}><Icon name="rotate-ccw" size={15} /> Reset view</button>
+              <button className="studio-tool-button" onClick={() => setShowAnnotations((value) => !value)} aria-pressed={showAnnotations}><Icon name="map" size={15} /> {showAnnotations ? "Hide labels" : "Show labels"}</button>
+              <button className="studio-tool-button" onClick={() => setResetKey((value) => value + 1)}><Icon name="arrow" size={15} /> Reset view</button>
               <button className="studio-tool-button" onClick={() => setDark((value) => !value)} aria-pressed={dark}><Icon name="sun" size={15} /> Lighting</button>
             </div>
           </div>
@@ -150,7 +150,7 @@ export default function Studio3DPage() {
             <span className="eyebrow">MODEL LIBRARY</span>
             <h2>Load a model</h2>
             <p>Choose a GLB or glTF asset from your device. The file remains in this browser session and is not transmitted.</p>
-            <label className="studio-upload" htmlFor="studio-model-file"><Icon name="upload" size={18} /><strong>Select 3D model</strong><span>GLB / glTF · Maximum 25 MB</span></label>
+            <label className="studio-upload" htmlFor="studio-model-file"><Icon name="file" size={18} /><strong>Select 3D model</strong><span>GLB / glTF · Maximum 25 MB</span></label>
             <input id="studio-model-file" className="studio-file-input" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" onChange={(event) => handleFile(event.target.files?.[0])} />
             {fileError && <p className="studio-error" role="alert">{fileError}</p>}
             {modelUrl && <button className="studio-clear-button" onClick={() => { URL.revokeObjectURL(modelUrl); setModelUrl(null); setModelName("SPECTRA illustrative reference model"); setSourceNote("Original geometric demonstration asset"); setLicenceNote("SPECTRA demo geometry — original"); }}>Unload local model</button>}
@@ -160,7 +160,7 @@ export default function Studio3DPage() {
             <span className="eyebrow">ANNOTATIONS</span>
             <h2>Explore features</h2>
             {modelUrl ? <p>Demo annotations apply only to the original sample geometry. Imported models are shown without inferred labels.</p> : <div className="studio-annotation-list">
-              {annotations.map((item) => <button key={item.id} className={`studio-annotation ${selectedAnnotation === item.id ? "studio-annotation-active" : ""}`} onClick={() => setSelectedAnnotation(item.id)}><span>{item.id}</span><strong>{item.title}</strong><Icon name="chevron-right" size={15} /></button>)}
+              {annotations.map((item) => <button key={item.id} className={`studio-annotation ${selectedAnnotation === item.id ? "studio-annotation-active" : ""}`} onClick={() => setSelectedAnnotation(item.id)}><span>{item.id}</span><strong>{item.title}</strong><Icon name="chevron" size={15} /></button>)}
             </div>}
             {!modelUrl && <div className="studio-annotation-detail"><strong>{activeAnnotation.title}</strong><p>{activeAnnotation.detail}</p></div>}
           </section>
