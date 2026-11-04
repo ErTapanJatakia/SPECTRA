@@ -1,6 +1,6 @@
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ErrorInfo, ReactNode } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
 import { Center, Html, OrbitControls, useGLTF } from "@react-three/drei";
@@ -341,9 +341,31 @@ function ImportedModel({ url }: { url: string }) {
   return <primitive object={cloned} dispose={null} />;
 }
 
-function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark }: {
+type PerformanceSample = { fps: number; geometries: number; textures: number; drawCalls: number };
+
+function PerformanceSampler({ onSample }: { onSample: (sample: PerformanceSample) => void }) {
+  const elapsedRef = useRef(0);
+  const framesRef = useRef(0);
+  useFrame(({ gl }, delta) => {
+    elapsedRef.current += delta;
+    framesRef.current += 1;
+    if (elapsedRef.current < 1) return;
+    onSample({
+      fps: Math.round(framesRef.current / elapsedRef.current),
+      geometries: gl.info.memory.geometries,
+      textures: gl.info.memory.textures,
+      drawCalls: gl.info.render.calls
+    });
+    elapsedRef.current = 0;
+    framesRef.current = 0;
+  });
+  return null;
+}
+
+function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark, dpr, onPerformanceSample }: {
   modelUrl: string | null; showAnnotations: boolean; selectedAnnotation: string;
-  onSelect: (id: string) => void; resetKey: number; dark: boolean;
+  onSelect: (id: string) => void; resetKey: number; dark: boolean; dpr: number;
+  onPerformanceSample: (sample: PerformanceSample) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextCleanupRef = useRef<(() => void) | null>(null);
@@ -369,7 +391,7 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
 
   return (
     <>
-    <Canvas onCreated={handleCreated} camera={{ position: [4.2, 3.1, 5.2], fov: 42 }} dpr={[1, 1.7]}
+    <Canvas onCreated={handleCreated} camera={{ position: [4.2, 3.1, 5.2], fov: 42 }} dpr={[0.65, dpr]}
       shadows gl={{ antialias: true, alpha: true }} fallback={<div className="studio-canvas-error">WebGL is unavailable in this browser. Use the text-based model notes below.</div>}>
       <color attach="background" args={[dark ? "#111b22" : "#e8eef0"]} />
       <ambientLight intensity={dark ? 1.15 : 1.5} />
@@ -381,6 +403,7 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
           {modelUrl ? <Center><ImportedModel url={modelUrl} /></Center> : <DemoModel showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation} onSelect={onSelect} />}
         </ModelErrorBoundary>
       </Suspense>
+      <PerformanceSampler onSample={onPerformanceSample} />
       <OrbitControls key={resetKey} makeDefault enableDamping dampingFactor={0.08} minDistance={2} maxDistance={18} />
     </Canvas>
     {contextLost && <div className="studio-canvas-error" role="alert">The WebGL context was lost. The viewer will resume if the browser restores graphics access; otherwise reload the page or use the text-based model notes.</div>}
@@ -399,6 +422,20 @@ export default function Studio3DPage() {
   const [showAnnotations, setShowAnnotations] = useState(true);
   const [resetKey, setResetKey] = useState(0);
   const [dark, setDark] = useState(true);
+  const [performance, setPerformance] = useState<PerformanceSample>({ fps: 0, geometries: 0, textures: 0, drawCalls: 0 });
+  const [renderDpr, setRenderDpr] = useState(1.25);
+
+  const handlePerformanceSample = useCallback((sample: PerformanceSample) => {
+    setPerformance(sample);
+    setRenderDpr((current) => {
+      const target = sample.fps < 24 ? 0.75 : sample.fps < 40 ? 0.95 : 1.25;
+      return Math.abs(current - target) < 0.01 ? current : target;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 600px)").matches) setRenderDpr(1);
+  }, []);
 
   useEffect(() => () => { if (modelUrl) { useGLTF.clear(modelUrl); URL.revokeObjectURL(modelUrl); } }, [modelUrl]);
 
@@ -448,10 +485,18 @@ export default function Studio3DPage() {
           </div>
           <div className="studio-canvas-wrap">
             <Scene modelUrl={modelUrl} showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation}
-              onSelect={setSelectedAnnotation} resetKey={resetKey} dark={dark} />
+              onSelect={setSelectedAnnotation} resetKey={resetKey} dark={dark} dpr={renderDpr} onPerformanceSample={handlePerformanceSample} />
             <div className="studio-viewer-hint"><span>DRAG · ORBIT</span><span>SCROLL · ZOOM</span><span>RIGHT-DRAG · PAN</span></div>
           </div>
           <div className="studio-viewer-caption"><span><i className="studio-status-dot" /> Browser-local rendering</span><span>No model is uploaded to SPECTRA servers</span></div>
+          <div className="studio-performance" role="status" aria-live="polite" aria-label="3D performance monitor">
+            <strong>PERFORMANCE MONITOR</strong>
+            <span>{performance.fps ? `${performance.fps} FPS` : "Sampling frame rate…"}</span>
+            <span>{performance.geometries} geometries</span>
+            <span>{performance.textures} textures</span>
+            <span>{performance.drawCalls} draw calls</span>
+            <span>Adaptive render scale · {Math.round(renderDpr * 100)}%</span>
+          </div>
         </div>
 
         <aside className="studio-side-panel">

@@ -301,3 +301,53 @@ test("3D Studio reports WebGL context loss and recovery", async ({ page }) => {
   });
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
+
+
+test("3D Studio exposes live rendering telemetry and adaptive quality", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const monitor = page.getByRole("status", { name: "3D performance monitor" });
+  await expect(monitor).toBeVisible();
+  await expect(monitor).toContainText("PERFORMANCE MONITOR");
+  await expect(monitor).toContainText("Adaptive render scale");
+  await expect(monitor).toContainText(/\d+ FPS/, { timeout: 10000 });
+});
+
+test("3D Studio survives repeated local model import and unload cycles", async ({ page }) => {
+  await page.addInitScript(() => {
+    const created: string[] = [];
+    const revoked: string[] = [];
+    const create = URL.createObjectURL.bind(URL);
+    const revoke = URL.revokeObjectURL.bind(URL);
+    URL.createObjectURL = (object: Blob) => {
+      const url = create(object);
+      created.push(url);
+      return url;
+    };
+    URL.revokeObjectURL = (url: string) => {
+      revoked.push(url);
+      revoke(url);
+    };
+    Object.defineProperty(window, "__spectraStressUrls", { value: { created, revoked } });
+  });
+  await page.goto("/studio-3d");
+  const model = { asset: { version: "2.0" }, scene: 0, scenes: [{ nodes: [] }] };
+  for (let cycle = 1; cycle <= 3; cycle += 1) {
+    await page.locator("#studio-model-file").setInputFiles({
+      name: `stress-model-${cycle}.gltf`,
+      mimeType: "model/gltf+json",
+      buffer: Buffer.from(JSON.stringify(model))
+    });
+    await expect(page.getByText("LOCAL MODEL", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Unload local model" }).click();
+    await expect(page.getByText("DEMONSTRATION SCENE")).toBeVisible();
+    await expect.poll(async () => page.evaluate((expected) => {
+      const tracker = (window as unknown as Window & { __spectraStressUrls: { created: string[]; revoked: string[] } }).__spectraStressUrls;
+      return tracker.created.length >= expected && tracker.revoked.length >= expected;
+    }, cycle)).toBe(true);
+  }
+  const totals = await page.evaluate(() => {
+    const tracker = (window as unknown as Window & { __spectraStressUrls: { created: string[]; revoked: string[] } }).__spectraStressUrls;
+    return { created: tracker.created.length, revoked: tracker.revoked.length };
+  });
+  expect(totals).toEqual({ created: 3, revoked: 3 });
+});
