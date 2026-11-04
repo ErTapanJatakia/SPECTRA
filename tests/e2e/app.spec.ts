@@ -217,3 +217,87 @@ test("3D Studio annotation and viewport controls remain keyboard-operable", asyn
   await page.getByRole("button", { name:/Show labels/ }).click();
   await expect(page.getByRole("button", { name:"Show annotation: Primary structure" })).toBeVisible();
 });
+
+
+test("3D Studio releases browser object URLs when a local model is unloaded", async ({ page }) => {
+  await page.addInitScript(() => {
+    const created: string[] = [];
+    const revoked: string[] = [];
+    const create = URL.createObjectURL.bind(URL);
+    const revoke = URL.revokeObjectURL.bind(URL);
+    URL.createObjectURL = (object: Blob) => {
+      const url = create(object);
+      created.push(url);
+      return url;
+    };
+    URL.revokeObjectURL = (url: string) => {
+      revoked.push(url);
+      revoke(url);
+    };
+    Object.defineProperty(window, "__spectraObjectUrls", { value: { created, revoked } });
+  });
+  await page.goto("/studio-3d");
+  const model = {
+    asset: { version: "2.0" },
+    scene: 0,
+    scenes: [{ nodes: [] }]
+  };
+  await page.locator("#studio-model-file").setInputFiles({
+    name: "minimal-local-model.gltf",
+    mimeType: "model/gltf+json",
+    buffer: Buffer.from(JSON.stringify(model))
+  });
+  await expect(page.getByText("LOCAL MODEL", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Unload local model" }).click();
+  await expect(page.getByText("DEMONSTRATION SCENE")).toBeVisible();
+  await expect.poll(async () => page.evaluate(() => {
+    const tracker = (window as unknown as Window & { __spectraObjectUrls: { created: string[]; revoked: string[] } }).__spectraObjectUrls;
+    return tracker.revoked.length === 1 && tracker.revoked[0] === tracker.created[0];
+  })).toBe(true);
+});
+
+test("3D Studio ignores stale validation results after a newer model is selected", async ({ page }) => {
+  await page.addInitScript(() => {
+    const originalText = Blob.prototype.text;
+    let delayFirstRead = true;
+    Blob.prototype.text = function () {
+      const result = originalText.call(this);
+      if (!delayFirstRead) return result;
+      delayFirstRead = false;
+      return new Promise<string>((resolve, reject) => {
+        setTimeout(() => { void result.then(resolve, reject); }, 200);
+      });
+    };
+  });
+  await page.goto("/studio-3d");
+  await page.locator("#studio-model-file").setInputFiles({
+    name: "stale-invalid.gltf",
+    mimeType: "model/gltf+json",
+    buffer: Buffer.from("{invalid")
+  });
+  const model = {
+    asset: { version: "2.0" },
+    scene: 0,
+    scenes: [{ nodes: [] }]
+  };
+  await page.locator("#studio-model-file").setInputFiles({
+    name: "current-model.gltf",
+    mimeType: "model/gltf+json",
+    buffer: Buffer.from(JSON.stringify(model))
+  });
+  await expect(page.getByText("LOCAL MODEL", { exact: true })).toBeVisible();
+  await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Unload local model" })).toBeVisible();
+});
+
+test("3D Studio reports WebGL context loss and recovery", async ({ page }) => {
+  await page.goto("/studio-3d");
+  await page.locator("canvas").first().evaluate((canvas) => {
+    canvas.dispatchEvent(new Event("webglcontextlost", { cancelable: true }));
+  });
+  await expect(page.getByRole("alert")).toContainText("The WebGL context was lost");
+  await page.locator("canvas").first().evaluate((canvas) => {
+    canvas.dispatchEvent(new Event("webglcontextrestored"));
+  });
+  await expect(page.getByRole("alert")).toHaveCount(0);
+});

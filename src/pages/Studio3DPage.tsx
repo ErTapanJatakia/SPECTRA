@@ -1,6 +1,8 @@
-import { Component, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ErrorInfo, ReactNode } from "react";
 import { Canvas } from "@react-three/fiber";
+import * as THREE from "three";
+import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
 import { Center, Html, OrbitControls, useGLTF } from "@react-three/drei";
 import PageHeading from "../components/PageHeading";
 import Icon from "../components/Icon";
@@ -286,18 +288,88 @@ function DemoModel({ showAnnotations, selectedAnnotation, onSelect }: {
   );
 }
 
+function cloneModelResources(source: THREE.Object3D): THREE.Object3D {
+  const cloned = cloneSkeleton(source);
+  cloned.traverse((object) => {
+    const mesh = object as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    mesh.geometry = mesh.geometry.clone();
+    const cloneMaterial = (material: THREE.Material): THREE.Material => {
+      const next = material.clone();
+      const properties = next as unknown as Record<string, unknown>;
+      for (const [key, value] of Object.entries(properties)) {
+        if (value && typeof value === "object" && (value as { isTexture?: boolean }).isTexture) {
+          properties[key] = (value as THREE.Texture).clone();
+        }
+      }
+      return next;
+    };
+    mesh.material = Array.isArray(mesh.material)
+      ? mesh.material.map(cloneMaterial)
+      : cloneMaterial(mesh.material);
+  });
+  return cloned;
+}
+
+function disposeModelResources(root: THREE.Object3D): void {
+  const geometries = new Set<THREE.BufferGeometry>();
+  const materials = new Set<THREE.Material>();
+  const textures = new Set<THREE.Texture>();
+  root.traverse((object) => {
+    const mesh = object as THREE.Mesh;
+    if (!mesh.isMesh) return;
+    geometries.add(mesh.geometry);
+    const meshMaterials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    for (const material of meshMaterials) {
+      materials.add(material);
+      for (const value of Object.values(material as unknown as Record<string, unknown>)) {
+        if (value && typeof value === "object" && (value as { isTexture?: boolean }).isTexture) {
+          textures.add(value as THREE.Texture);
+        }
+      }
+    }
+  });
+  geometries.forEach((geometry) => geometry.dispose());
+  materials.forEach((material) => material.dispose());
+  textures.forEach((texture) => texture.dispose());
+}
+
 function ImportedModel({ url }: { url: string }) {
   const { scene } = useGLTF(url);
-  const cloned = useMemo(() => scene.clone(true), [scene]);
-  return <primitive object={cloned} />;
+  const cloned = useMemo(() => cloneModelResources(scene), [scene]);
+  useEffect(() => () => disposeModelResources(cloned), [cloned]);
+  return <primitive object={cloned} dispose={null} />;
 }
 
 function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark }: {
   modelUrl: string | null; showAnnotations: boolean; selectedAnnotation: string;
   onSelect: (id: string) => void; resetKey: number; dark: boolean;
 }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const contextCleanupRef = useRef<(() => void) | null>(null);
+  const [contextLost, setContextLost] = useState(false);
+  const handleCreated = useCallback(({ gl }: { gl: { domElement: HTMLCanvasElement } }) => {
+    contextCleanupRef.current?.();
+    const canvas = gl.domElement;
+    const handleContextLost = (event: Event) => {
+      event.preventDefault();
+      setContextLost(true);
+    };
+    const handleContextRestored = () => setContextLost(false);
+    canvasRef.current = canvas;
+    canvas.addEventListener("webglcontextlost", handleContextLost, false);
+    canvas.addEventListener("webglcontextrestored", handleContextRestored, false);
+    contextCleanupRef.current = () => {
+      canvas.removeEventListener("webglcontextlost", handleContextLost);
+      canvas.removeEventListener("webglcontextrestored", handleContextRestored);
+      if (canvasRef.current === canvas) canvasRef.current = null;
+    };
+  }, []);
+  useEffect(() => () => contextCleanupRef.current?.(), []);
+
   return (
-    <Canvas camera={{ position: [4.2, 3.1, 5.2], fov: 42 }} dpr={[1, 1.7]}
+    <>
+    <Canvas onCreated={handleCreated} camera={{ position: [4.2, 3.1, 5.2], fov: 42 }} dpr={[1, 1.7]}
       shadows gl={{ antialias: true, alpha: true }} fallback={<div className="studio-canvas-error">WebGL is unavailable in this browser. Use the text-based model notes below.</div>}>
       <color attach="background" args={[dark ? "#111b22" : "#e8eef0"]} />
       <ambientLight intensity={dark ? 1.15 : 1.5} />
@@ -311,6 +383,8 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
       </Suspense>
       <OrbitControls key={resetKey} makeDefault enableDamping dampingFactor={0.08} minDistance={2} maxDistance={18} />
     </Canvas>
+    {contextLost && <div className="studio-canvas-error" role="alert">The WebGL context was lost. The viewer will resume if the browser restores graphics access; otherwise reload the page or use the text-based model notes.</div>}
+    </>
   );
 }
 
