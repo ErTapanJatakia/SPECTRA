@@ -251,7 +251,7 @@ test("3D Studio releases browser object URLs when a local model is unloaded", as
   await page.getByRole("button", { name: "Unload local model" }).click();
   await expect(page.getByText("DEMONSTRATION SCENE")).toBeVisible();
   await expect.poll(async () => page.evaluate(() => {
-    const tracker = (window as Window & { __spectraObjectUrls: { created: string[]; revoked: string[] } }).__spectraObjectUrls;
+    const tracker = (window as unknown as Window & { __spectraObjectUrls: { created: string[]; revoked: string[] } }).__spectraObjectUrls;
     return tracker.revoked.length === 1 && tracker.revoked[0] === tracker.created[0];
   })).toBe(true);
 });
