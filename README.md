@@ -28,7 +28,7 @@ The project is intended to help security professionals, defence-sector personnel
 
 SPECTRA is being designed as a **supplementary learning and familiarisation resource**. It is not an operational military system, a weapons proficiency programme, or a replacement for authorised professional, national, or United Nations training.
 
-> **Project stage:** Project Charter (Prompt 00), Architecture & Product Blueprint (Prompt 01), Repository Bootstrap & Design System (Prompt 02), and the initial Military Systems Knowledge Base (Prompt 03) are implemented. The current catalogue is a curated starter sample; the 3D Studio, Learning Academy and peacekeeping curriculum remain planned for their dedicated stages.
+> **Project stage:** Project Charter (Prompt 00), Architecture & Product Blueprint (Prompt 01), Repository Bootstrap & Design System (Prompt 02), the initial Military Systems Knowledge Base (Prompt 03), and the Interactive 3D Studio (Prompt 04) are implemented. The current catalogue remains a curated starter sample; the Learning Academy and peacekeeping curriculum remain planned for their dedicated stages.
 
 ## Mission
 
@@ -105,7 +105,7 @@ All such capabilities remain planned until implemented, tested, and documented i
 
 ## Interactive 3D learning
 
-A proposed SPECTRA 3D Studio will provide browser-based educational viewing of appropriately licensed models. Planned interactions include model rotation, zoom, pan, labelled educational hotspots, annotations, and non-functional visual separation of external features.
+The SPECTRA 3D Studio now provides browser-based educational viewing of original demonstration geometry and user-selected GLB/glTF 2.0 models. Interactions include model orbit, zoom, pan, camera reset, lighting controls, and labelled educational annotations. Imported assets are limited to 25 MB, checked for basic glTF structure and scene-size limits, and blocked from loading external buffer or image resources. Model files are handled locally in the browser and are not uploaded to SPECTRA. Provenance and licence notes are session metadata only; they do not independently verify rights. Only use assets you are authorised to view and process.
 
 The 3D experience is intended for identification and visual literacy. It will not provide procedural firearm assembly or disassembly, operational weapon-use instructions, firing solutions, targeting calculations, or weapon modification guidance.
 
