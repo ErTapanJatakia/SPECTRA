@@ -1,5 +1,5 @@
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ErrorInfo, ReactNode } from "react";
+import type { ErrorInfo, ReactNode, RefObject } from "react";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
@@ -374,7 +374,7 @@ type ViewCommand = { id: number; preset: CameraPreset | "fit"; target: [number, 
 
 function ViewportCameraController({ command, controlsRef }: {
   command: ViewCommand | null;
-  controlsRef: React.RefObject<OrbitControlsImpl | null>;
+  controlsRef: RefObject<OrbitControlsImpl | null>;
 }) {
   const { camera } = useThree();
   useEffect(() => {
