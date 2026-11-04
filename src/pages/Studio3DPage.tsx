@@ -1,7 +1,7 @@
 import { Component, Suspense, useEffect, useMemo, useState } from "react";
 import type { ErrorInfo, ReactNode } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Html, OrbitControls, useGLTF } from "@react-three/drei";
+import { Center, Html, OrbitControls, useGLTF } from "@react-three/drei";
 import PageHeading from "../components/PageHeading";
 import Icon from "../components/Icon";
 import "./studio3d.css";
@@ -112,7 +112,7 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
       <gridHelper args={[12, 24, dark ? "#334b56" : "#c1d0d4", dark ? "#263943" : "#d2dcdf"]} position={[0, -0.8, 0]} />
       <Suspense fallback={<Html center><div className="studio-loader">Loading model…</div></Html>}>
         <ModelErrorBoundary>
-          {modelUrl ? <ImportedModel url={modelUrl} /> : <DemoModel showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation} onSelect={onSelect} />}
+          {modelUrl ? <Center><ImportedModel url={modelUrl} /></Center> : <DemoModel showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation} onSelect={onSelect} />}
         </ModelErrorBoundary>
       </Suspense>
       <OrbitControls key={resetKey} makeDefault enableDamping dampingFactor={0.08} minDistance={2} maxDistance={18} />
@@ -131,7 +131,7 @@ export default function Studio3DPage() {
   const [resetKey, setResetKey] = useState(0);
   const [dark, setDark] = useState(true);
 
-  useEffect(() => () => { if (modelUrl) URL.revokeObjectURL(modelUrl); }, [modelUrl]);
+  useEffect(() => () => { if (modelUrl) { useGLTF.clear(modelUrl); URL.revokeObjectURL(modelUrl); } }, [modelUrl]);
 
   function handleFile(file?: File) {
     if (!file) return;
@@ -183,7 +183,7 @@ export default function Studio3DPage() {
             <label className="studio-upload" htmlFor="studio-model-file"><Icon name="file" size={18} /><strong>Select 3D model</strong><span>GLB / glTF 2.0 · 25 MB maximum · Embedded resources only</span></label>
             <input id="studio-model-file" className="studio-file-input" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" onChange={(event) => handleFile(event.target.files?.[0])} />
             {fileError && <p className="studio-error" role="alert">{fileError}</p>}
-            {modelUrl && <button className="studio-clear-button" onClick={() => { URL.revokeObjectURL(modelUrl); setModelUrl(null); setModelName("SPECTRA illustrative reference model"); setSourceNote("Original geometric demonstration asset"); setLicenceNote("SPECTRA demo geometry — original"); }}>Unload local model</button>}
+            {modelUrl && <button className="studio-clear-button" onClick={() => { setModelUrl(null); setModelName("SPECTRA illustrative reference model"); setSourceNote("Original geometric demonstration asset"); setLicenceNote("SPECTRA demo geometry — original"); }}>Unload local model</button>}
           </section>
 
           <section className="studio-panel-section">
