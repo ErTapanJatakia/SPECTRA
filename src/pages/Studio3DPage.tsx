@@ -422,6 +422,20 @@ export default function Studio3DPage() {
   const [showAnnotations, setShowAnnotations] = useState(true);
   const [resetKey, setResetKey] = useState(0);
   const [dark, setDark] = useState(true);
+  const [performance, setPerformance] = useState<PerformanceSample>({ fps: 0, geometries: 0, textures: 0, drawCalls: 0 });
+  const [renderDpr, setRenderDpr] = useState(1.25);
+
+  const handlePerformanceSample = useCallback((sample: PerformanceSample) => {
+    setPerformance(sample);
+    setRenderDpr((current) => {
+      const target = sample.fps < 24 ? 0.75 : sample.fps < 40 ? 0.95 : 1.25;
+      return Math.abs(current - target) < 0.01 ? current : target;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 600px)").matches) setRenderDpr(1);
+  }, []);
 
   useEffect(() => () => { if (modelUrl) { useGLTF.clear(modelUrl); URL.revokeObjectURL(modelUrl); } }, [modelUrl]);
 
