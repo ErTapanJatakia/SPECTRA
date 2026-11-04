@@ -1,11 +1,12 @@
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ErrorInfo, ReactNode } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
 import { Center, Html, OrbitControls, useGLTF } from "@react-three/drei";
 import PageHeading from "../components/PageHeading";
 import Icon from "../components/Icon";
+import { inspectModelHierarchy, type ModelNodeSnapshot } from "../lib/modelInspection";
 import "./studio3d.css";
 
 const MAX_MODEL_BYTES = 25 * 1024 * 1024;
@@ -334,11 +335,35 @@ function disposeModelResources(root: THREE.Object3D): void {
   textures.forEach((texture) => texture.dispose());
 }
 
-function ImportedModel({ url }: { url: string }) {
+function SelectionOutline({ root, selectedNodeId }: { root: THREE.Object3D; selectedNodeId: string }) {
+  const { scene } = useThree();
+  useEffect(() => {
+    if (!selectedNodeId) return;
+    const target = selectedNodeId.split(".").slice(1).reduce<THREE.Object3D | undefined>(
+      (parent, index) => parent?.children[Number(index)], root
+    );
+    if (!target) return;
+    const helper = new THREE.BoxHelper(target, "#72b8a4");
+    scene.add(helper);
+    return () => {
+      scene.remove(helper);
+      helper.geometry.dispose();
+      (helper.material as THREE.Material).dispose();
+    };
+  }, [root, scene, selectedNodeId]);
+  return null;
+}
+
+function ImportedModel({ url, selectedNodeId, onHierarchyChange }: {
+  url: string; selectedNodeId: string; onHierarchyChange: (nodes: ModelNodeSnapshot[]) => void;
+}) {
   const { scene } = useGLTF(url);
   const cloned = useMemo(() => cloneModelResources(scene), [scene]);
+  useEffect(() => {
+    onHierarchyChange(inspectModelHierarchy(cloned));
+  }, [cloned, onHierarchyChange]);
   useEffect(() => () => disposeModelResources(cloned), [cloned]);
-  return <primitive object={cloned} dispose={null} />;
+  return <><primitive object={cloned} dispose={null} /><SelectionOutline root={cloned} selectedNodeId={selectedNodeId} /></>;
 }
 
 type PerformanceSample = { fps: number; geometries: number; textures: number; drawCalls: number };
@@ -362,10 +387,11 @@ function PerformanceSampler({ onSample }: { onSample: (sample: PerformanceSample
   return null;
 }
 
-function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark, dpr, reducedMotion, onPerformanceSample }: {
+function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetKey, dark, dpr, reducedMotion, onPerformanceSample, selectedNodeId, onHierarchyChange }: {
   modelUrl: string | null; showAnnotations: boolean; selectedAnnotation: string;
   onSelect: (id: string) => void; resetKey: number; dark: boolean; dpr: number; reducedMotion: boolean;
-  onPerformanceSample: (sample: PerformanceSample) => void;
+  onPerformanceSample: (sample: PerformanceSample) => void; selectedNodeId: string;
+  onHierarchyChange: (nodes: ModelNodeSnapshot[]) => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contextCleanupRef = useRef<(() => void) | null>(null);
@@ -404,7 +430,7 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
       <gridHelper args={[12, 24, dark ? "#334b56" : "#c1d0d4", dark ? "#263943" : "#d2dcdf"]} position={[0, -0.8, 0]} />
       <Suspense fallback={<Html center><div className="studio-loader">Loading model…</div></Html>}>
         <ModelErrorBoundary>
-          {modelUrl ? <Center><ImportedModel url={modelUrl} /></Center> : <DemoModel showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation} onSelect={onSelect} />}
+          {modelUrl ? <Center><ImportedModel url={modelUrl} selectedNodeId={selectedNodeId} onHierarchyChange={onHierarchyChange} /></Center> : <DemoModel showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation} onSelect={onSelect} />}
         </ModelErrorBoundary>
       </Suspense>
       <PerformanceSampler onSample={onPerformanceSample} />
@@ -423,12 +449,26 @@ export default function Studio3DPage() {
   const [licenceNote, setLicenceNote] = useState("SPECTRA demo geometry — original");
   const [fileError, setFileError] = useState("");
   const [selectedAnnotation, setSelectedAnnotation] = useState("01");
+  const [modelNodes, setModelNodes] = useState<ModelNodeSnapshot[]>([]);
+  const [selectedNodeId, setSelectedNodeId] = useState("");
+  const [nodeSearch, setNodeSearch] = useState("");
   const [showAnnotations, setShowAnnotations] = useState(true);
   const [resetKey, setResetKey] = useState(0);
   const [dark, setDark] = useState(true);
   const [performance, setPerformance] = useState<PerformanceSample>({ fps: 0, geometries: 0, textures: 0, drawCalls: 0 });
   const [renderDpr, setRenderDpr] = useState(1.25);
   const [reducedMotion, setReducedMotion] = useState(false);
+
+  const handleHierarchyChange = useCallback((nodes: ModelNodeSnapshot[]) => {
+    setModelNodes(nodes);
+    setSelectedNodeId((current) => nodes.some((node) => node.id === current) ? current : (nodes[0]?.id ?? ""));
+  }, []);
+
+  const visibleModelNodes = useMemo(() => {
+    const query = nodeSearch.trim().toLowerCase();
+    return modelNodes.filter((node) => !query || `${node.name} ${node.type} ${node.materials?.join(" ") ?? ""}`.toLowerCase().includes(query)).slice(0, 200);
+  }, [modelNodes, nodeSearch]);
+  const selectedModelNode = modelNodes.find((node) => node.id === selectedNodeId);
 
   const handlePerformanceSample = useCallback((sample: PerformanceSample) => {
     setPerformance(sample);
@@ -448,6 +488,7 @@ export default function Studio3DPage() {
   }, []);
 
   useEffect(() => () => { if (modelUrl) { useGLTF.clear(modelUrl); URL.revokeObjectURL(modelUrl); } }, [modelUrl]);
+  useEffect(() => { if (!modelUrl) { setModelNodes([]); setSelectedNodeId(""); setNodeSearch(""); } }, [modelUrl]);
 
   async function handleFile(file?: File) {
     if (!file) return;
@@ -496,7 +537,8 @@ export default function Studio3DPage() {
           <div className="studio-canvas-wrap">
             <p id="studio-viewport-instructions" className="studio-sr-only">The 3D viewport is keyboard focusable. Use the Reset view button to restore the default view. Annotation controls are available in the Explore features panel. The viewport also supports pointer and touch navigation.</p>
             <Scene modelUrl={modelUrl} showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation}
-              onSelect={setSelectedAnnotation} resetKey={resetKey} dark={dark} dpr={renderDpr} reducedMotion={reducedMotion} onPerformanceSample={handlePerformanceSample} />
+              onSelect={setSelectedAnnotation} resetKey={resetKey} dark={dark} dpr={renderDpr} reducedMotion={reducedMotion} onPerformanceSample={handlePerformanceSample}
+              selectedNodeId={selectedNodeId} onHierarchyChange={handleHierarchyChange} />
             <div className="studio-viewer-hint"><span>DRAG · ORBIT</span><span>SCROLL · ZOOM</span><span>RIGHT-DRAG · PAN</span></div>
           </div>
           <div className="studio-viewer-caption"><span><i className="studio-status-dot" /> Browser-local rendering</span><span>No model is uploaded to SPECTRA servers</span></div>
@@ -521,6 +563,36 @@ export default function Studio3DPage() {
             {modelUrl && <button className="studio-clear-button" onClick={() => { importRequestRef.current += 1; setModelUrl(null); setModelName("SPECTRA illustrative reference model"); setSourceNote("Original geometric demonstration asset"); setLicenceNote("SPECTRA demo geometry — original"); }}>Unload local model</button>}
           </section>
 
+          {modelUrl && <section className="studio-panel-section studio-inspector" aria-label="Model hierarchy inspector">
+            <span className="eyebrow">MODEL INSPECTOR</span>
+            <h2>Scene hierarchy</h2>
+            <p>Read-only view of the loaded Three.js scene. Node names are labels, not trusted metadata.</p>
+            <label htmlFor="studio-node-search">Search objects<input id="studio-node-search" type="search" value={nodeSearch} onChange={(event) => setNodeSearch(event.target.value)} placeholder="Name, type or material" /></label>
+            <div className="studio-node-tree" role="list" aria-label="Model objects">
+              {visibleModelNodes.map((node) => <button key={node.id} type="button" role="listitem"
+                className={`studio-node-item ${selectedNodeId === node.id ? "studio-node-active" : ""}`}
+                style={{ paddingLeft: `${10 + node.id.split(".").length * 12}px` }}
+                onClick={() => setSelectedNodeId(node.id)} aria-pressed={selectedNodeId === node.id}>
+                <span>{node.isMesh ? "◈" : "▸"}</span><strong>{node.name}</strong><small>{node.type}</small>
+              </button>)}
+              {visibleModelNodes.length === 0 && <p className="studio-inspector-empty">No matching scene objects.</p>}
+            </div>
+            {modelNodes.length > 200 && <p className="studio-inspector-empty">Showing up to 200 matching objects of {modelNodes.length.toLocaleString("en-US")}.</p>}
+            {selectedModelNode && <div className="studio-node-properties" aria-live="polite">
+              <strong>Selected object · {selectedModelNode.type}</strong>
+              <span>Name: {selectedModelNode.name}</span>
+              <span>Position: {selectedModelNode.position.map((value) => value.toFixed(3)).join(", ")}</span>
+              <span>Rotation: {selectedModelNode.rotation.map((value) => value.toFixed(3)).join(", ")}</span>
+              <span>Scale: {selectedModelNode.scale.map((value) => value.toFixed(3)).join(", ")}</span>
+              <span>Visible: {selectedModelNode.visible ? "Yes" : "No"}</span>
+              {selectedModelNode.isMesh && <>
+                <span>Geometry: {selectedModelNode.geometryType}</span>
+                <span>Vertices: {selectedModelNode.vertexCount?.toLocaleString("en-US")}</span>
+                <span>Indices: {selectedModelNode.indexCount?.toLocaleString("en-US")}</span>
+                <span>Materials: {selectedModelNode.materials?.join(", ") || "None"}</span>
+              </>}
+            </div>}
+          </section>}
           <section className="studio-panel-section">
             <span className="eyebrow">ANNOTATIONS</span>
             <h2>Explore features</h2>
