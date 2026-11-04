@@ -403,7 +403,8 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
           {modelUrl ? <Center><ImportedModel url={modelUrl} /></Center> : <DemoModel showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation} onSelect={onSelect} />}
         </ModelErrorBoundary>
       </Suspense>
-      <PerformanceSampler onSample={onPerformanceSample} />\n      <OrbitControls key={resetKey} makeDefault enableDamping dampingFactor={0.08} minDistance={2} maxDistance={18} />
+      <PerformanceSampler onSample={onPerformanceSample} />
+      <OrbitControls key={resetKey} makeDefault enableDamping dampingFactor={0.08} minDistance={2} maxDistance={18} />
     </Canvas>
     {contextLost && <div className="studio-canvas-error" role="alert">The WebGL context was lost. The viewer will resume if the browser restores graphics access; otherwise reload the page or use the text-based model notes.</div>}
     </>
