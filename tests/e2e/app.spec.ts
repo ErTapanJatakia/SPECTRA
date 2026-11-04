@@ -100,3 +100,120 @@ test("3D Studio rejects textures with excessive pixel dimensions", async ({ page
   });
   await expect(page.getByRole("alert")).toContainText("4,096 pixels per side");
 });
+
+
+test("3D Studio blocks remote buffer resources", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const document = { asset:{ version:"2.0" }, buffers:[{ byteLength:16, uri:"https://example.invalid/model.bin" }] };
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"remote-buffer.gltf", mimeType:"model/gltf+json", buffer:Buffer.from(JSON.stringify(document))
+  });
+  await expect(page.getByRole("alert")).toContainText("External model resources are blocked");
+});
+
+test("3D Studio rejects malformed embedded buffer encodings", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const document = { asset:{ version:"2.0" }, buffers:[{ byteLength:4, uri:"data:application/octet-stream,AAAA" }] };
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"malformed-buffer.gltf", mimeType:"model/gltf+json", buffer:Buffer.from(JSON.stringify(document))
+  });
+  await expect(page.getByRole("alert")).toContainText("Buffers must use embedded base64");
+});
+
+test("3D Studio rejects invalid bufferView references and ranges", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const document = {
+    asset:{ version:"2.0" },
+    buffers:[{ byteLength:8, uri:"data:application/octet-stream;base64,AAAAAAAAAAA=" }],
+    bufferViews:[{ buffer:1, byteLength:4 }]
+  };
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"invalid-buffer-view.gltf", mimeType:"model/gltf+json", buffer:Buffer.from(JSON.stringify(document))
+  });
+  await expect(page.getByRole("alert")).toContainText("invalid bufferView range");
+});
+
+test("3D Studio rejects malformed accessor definitions", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const document = {
+    asset:{ version:"2.0" },
+    accessors:[{ count:1, type:"VEC3", componentType:9999 }]
+  };
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"invalid-accessor.gltf", mimeType:"model/gltf+json", buffer:Buffer.from(JSON.stringify(document))
+  });
+  await expect(page.getByRole("alert")).toContainText("invalid or unsupported accessor");
+});
+
+test("3D Studio rejects excessive mesh primitive counts", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const document = {
+    asset:{ version:"2.0" },
+    meshes:[{ primitives:Array.from({ length:1001 }, () => ({})) }]
+  };
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"too-many-primitives.gltf", mimeType:"model/gltf+json", buffer:Buffer.from(JSON.stringify(document))
+  });
+  await expect(page.getByRole("alert")).toContainText("1,000 primitive limit");
+});
+
+test("3D Studio rejects excessive embedded image counts", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const document = {
+    asset:{ version:"2.0" },
+    images:Array.from({ length:13 }, () => ({ uri:"data:image/png;base64," }))
+  };
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"too-many-images.gltf", mimeType:"model/gltf+json", buffer:Buffer.from(JSON.stringify(document))
+  });
+  await expect(page.getByRole("alert")).toContainText("too many images");
+});
+
+test("3D Studio rejects malformed GLB chunk boundaries", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const malformed = Buffer.alloc(20);
+  malformed.writeUInt32LE(0x46546c67,0);
+  malformed.writeUInt32LE(2,4);
+  malformed.writeUInt32LE(20,8);
+  malformed.writeUInt32LE(8,12);
+  malformed.writeUInt32LE(0x4e4f534a,16);
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"truncated-chunk.glb", mimeType:"model/gltf-binary", buffer:malformed
+  });
+  await expect(page.getByRole("alert")).toContainText("invalid or truncated chunk");
+});
+
+test("3D Studio rejects zero-byte files and unsupported extensions", async ({ page }) => {
+  await page.goto("/studio-3d");
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"empty.gltf", mimeType:"model/gltf+json", buffer:Buffer.alloc(0)
+  });
+  await expect(page.getByRole("alert")).toContainText("empty");
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"model.obj", mimeType:"text/plain", buffer:Buffer.from("v 0 0 0")
+  });
+  await expect(page.getByRole("alert")).toContainText("Unsupported file");
+});
+
+test("3D Studio keeps the demonstration scene available after a rejected import", async ({ page }) => {
+  await page.goto("/studio-3d");
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"invalid.gltf", mimeType:"model/gltf+json", buffer:Buffer.from("{not-json")
+  });
+  await expect(page.getByRole("alert")).toContainText("invalid JSON");
+  await expect(page.getByText("DEMONSTRATION SCENE")).toBeVisible();
+  await expect(page.getByRole("heading", { name:"Explore features" })).toBeVisible();
+});
+
+test("3D Studio annotation and viewport controls remain keyboard-operable", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const firstAnnotation = page.getByRole("button", { name:"01 Primary structure" });
+  await expect(firstAnnotation).toBeVisible();
+  await firstAnnotation.focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByText("A visual reference point for understanding the model's overall form.")).toBeVisible();
+  await page.getByRole("button", { name:/Hide labels/ }).click();
+  await expect(page.getByRole("button", { name:"Show annotation: Primary structure" })).toHaveCount(0);
+  await page.getByRole("button", { name:/Show labels/ }).click();
+  await expect(page.getByRole("button", { name:"Show annotation: Primary structure" })).toBeVisible();
+});
