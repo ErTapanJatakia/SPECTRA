@@ -1,4 +1,3 @@
-![SPECTRA — Global Defence Systems & Peace Operations Learning Atlas]
 
 <div align="center">
 
