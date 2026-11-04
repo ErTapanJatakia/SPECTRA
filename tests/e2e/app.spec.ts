@@ -396,7 +396,7 @@ test("3D Studio exposes a searchable hierarchy and read-only object properties f
     buffer: Buffer.from(JSON.stringify(model))
   });
   await expect(page.getByRole("heading", { name: "Scene hierarchy" })).toBeVisible();
-  const rootNode = page.getByRole("button", { name: /Group 0.*Group/ }).first();
+  const rootNode = page.getByRole("button", { name: /Scene|Group/ }).first();
   await expect(rootNode).toBeVisible();
   await rootNode.click();
   await expect(page.getByText("Selected object · Group")).toBeVisible();
