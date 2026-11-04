@@ -58,3 +58,20 @@ test("theme preference can be changed", async ({ page }) => {
   await page.getByLabel("Visual theme").selectOption("contrast");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "contrast");
 });
+
+test("3D Studio opens with the educational demonstration model", async ({ page }) => {
+  await page.goto("/studio-3d");
+  await expect(page.locator("h1", { hasText:"3D Studio" })).toBeVisible();
+  await expect(page.getByText("DEMONSTRATION SCENE")).toBeVisible();
+  await expect(page.getByRole("heading", { name:"Explore features" })).toBeVisible();
+  await expect(page.getByLabel("Select 3D model")).toHaveAttribute("accept", /glb/);
+  await expect(page.getByText(/Educational use only/)).toBeVisible();
+});
+
+test("3D Studio rejects an invalid local model before rendering", async ({ page }) => {
+  await page.goto("/studio-3d");
+  await page.locator("#studio-model-file").setInputFiles({
+    name:"invalid.glb", mimeType:"model/gltf-binary", buffer:Buffer.from("not a glb")
+  });
+  await expect(page.getByRole("alert")).toContainText("GLB header is invalid");
+});
