@@ -7,6 +7,16 @@ import Icon from "../components/Icon";
 import "./studio3d.css";
 
 const MAX_MODEL_BYTES = 25 * 1024 * 1024;
+const MAX_TOTAL_BUFFER_BYTES = 20 * 1024 * 1024;
+const MAX_NODES = 2500;
+const MAX_MESHES = 500;
+const MAX_PRIMITIVES = 1000;
+const MAX_ACCESSORS = 4000;
+const MAX_BUFFER_VIEWS = 4000;
+const MAX_ACCESSOR_ELEMENTS = 2_000_000;
+const MAX_IMAGES = 12;
+const MAX_TEXTURE_DIMENSION = 4096;
+const MAX_TEXTURE_PIXELS = 16_777_216;
 const ACCEPTED_EXTENSIONS = [".glb", ".gltf"];
 
 function parseModelDocument(text: string): Record<string, unknown> {
@@ -22,7 +32,7 @@ function parseModelDocument(text: string): Record<string, unknown> {
   return parsed as Record<string, unknown>;
 }
 
-function parseGlbDocument(bytes: ArrayBuffer): Record<string, unknown> {
+function parseGlbDocument(bytes: ArrayBuffer): { document: Record<string, unknown>; binaryChunk: Uint8Array | null } {
   const view = new DataView(bytes);
   if (bytes.byteLength < 20 || view.getUint32(0, true) !== 0x46546c67 ||
       view.getUint32(4, true) !== 2 || view.getUint32(8, true) !== bytes.byteLength) {
@@ -32,6 +42,7 @@ function parseGlbDocument(bytes: ArrayBuffer): Record<string, unknown> {
   let offset = 12;
   let jsonDocument: Record<string, unknown> | null = null;
   let binaryChunkCount = 0;
+  let binaryChunk: Uint8Array | null = null;
   let chunkIndex = 0;
 
   while (offset < bytes.byteLength) {
@@ -57,6 +68,7 @@ function parseGlbDocument(bytes: ArrayBuffer): Record<string, unknown> {
       if (binaryChunkCount > 1 || !jsonDocument) {
         throw new Error("The GLB binary chunk is duplicated or incorrectly ordered.");
       }
+      binaryChunk = new Uint8Array(bytes, chunkStart, chunkLength);
     }
     offset = chunkEnd;
     chunkIndex += 1;
@@ -65,13 +77,15 @@ function parseGlbDocument(bytes: ArrayBuffer): Record<string, unknown> {
   if (offset !== bytes.byteLength || !jsonDocument) {
     throw new Error("The GLB container is incomplete or has no JSON document.");
   }
-  return jsonDocument;
+  return { document: jsonDocument, binaryChunk };
 }
 
 async function validateModelFile(file: File, extension: string): Promise<void> {
-  const document = extension === ".glb"
+  const parsed = extension === ".glb"
     ? parseGlbDocument(await file.arrayBuffer())
-    : parseModelDocument(await file.text());
+    : { document: parseModelDocument(await file.text()), binaryChunk: null };
+  const document = parsed.document;
+  const binaryChunk = parsed.binaryChunk;
 
   const asset = document.asset;
   if (!asset || typeof asset !== "object" || Array.isArray(asset) ||
@@ -79,42 +93,147 @@ async function validateModelFile(file: File, extension: string): Promise<void> {
     throw new Error("Only glTF 2.0 models are supported.");
   }
 
-  for (const collectionName of ["buffers", "images"] as const) {
-    const collection = document[collectionName];
-    if (collection !== undefined && !Array.isArray(collection)) {
-      throw new Error(`The model's ${collectionName} property must be an array.`);
-    }
-    if (!Array.isArray(collection)) continue;
+  const array = (name: string, maximum: number): unknown[] => {
+    const value = document[name];
+    if (value !== undefined && !Array.isArray(value)) throw new Error(`The model's ${name} property must be an array.`);
+    const result = Array.isArray(value) ? value : [];
+    if (result.length > maximum) throw new Error(`The model contains too many ${name} (maximum ${maximum.toLocaleString("en-US")}).`);
+    return result;
+  };
+  void array("nodes", MAX_NODES);
+  const meshes = array("meshes", MAX_MESHES);
+  const accessors = array("accessors", MAX_ACCESSORS);
+  const bufferViews = array("bufferViews", MAX_BUFFER_VIEWS);
+  const buffers = array("buffers", 8);
+  const images = array("images", MAX_IMAGES);
+  array("materials", 256);
 
-    for (const entry of collection) {
-      if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
-        throw new Error(`The model contains an invalid ${collectionName} entry.`);
-      }
-      const uri = (entry as { uri?: unknown }).uri;
-      if (uri === undefined) continue;
-      if (typeof uri !== "string" || !/^data:/i.test(uri)) {
-        throw new Error("External model resources are blocked. Use a self-contained GLB or embedded data URIs.");
-      }
-      const allowedDataUri = collectionName === "buffers"
-        ? /^data:application\/(?:octet-stream|gltf-buffer);base64,/i
-        : /^data:image\/(?:png|jpeg|webp);base64,/i;
-      if (!allowedDataUri.test(uri)) {
-        throw new Error(`The embedded ${collectionName === "images" ? "image" : "buffer"} data URI uses an unsupported or unsafe format.`);
-      }
+  let primitiveCount = 0;
+  for (const mesh of meshes) {
+    if (!mesh || typeof mesh !== "object" || Array.isArray(mesh)) throw new Error("The model contains an invalid mesh entry.");
+    const primitives = (mesh as { primitives?: unknown }).primitives;
+    if (!Array.isArray(primitives) || primitives.length === 0) throw new Error("Each mesh must contain at least one primitive.");
+    primitiveCount += primitives.length;
+    if (primitiveCount > MAX_PRIMITIVES) throw new Error("The model exceeds the 1,000 primitive limit.");
+  }
+
+  let accessorElements = 0;
+  const componentCounts: Record<string, number> = { SCALAR: 1, VEC2: 2, VEC3: 3, VEC4: 4, MAT2: 4, MAT3: 9, MAT4: 16 };
+  for (const accessor of accessors) {
+    if (!accessor || typeof accessor !== "object" || Array.isArray(accessor)) throw new Error("The model contains an invalid accessor.");
+    const item = accessor as { count?: unknown; type?: unknown; componentType?: unknown };
+    if (!Number.isSafeInteger(item.count) || (item.count as number) < 1 || !componentCounts[String(item.type)] ||
+        ![5120, 5121, 5122, 5123, 5125, 5126].includes(Number(item.componentType))) {
+      throw new Error("The model contains an invalid or unsupported accessor definition.");
+    }
+    accessorElements += (item.count as number) * componentCounts[String(item.type)];
+    if (!Number.isSafeInteger(accessorElements) || accessorElements > MAX_ACCESSOR_ELEMENTS) {
+      throw new Error("The model exceeds the 2,000,000 accessor-element budget.");
     }
   }
 
-  for (const [collectionName, maximum] of [["nodes", 10000], ["meshes", 2000]] as const) {
-    const collection = document[collectionName];
-    if (collection !== undefined && !Array.isArray(collection)) {
-      throw new Error(`The model's ${collectionName} property must be an array.`);
+  let totalBufferBytes = 0;
+  for (const buffer of buffers) {
+    if (!buffer || typeof buffer !== "object" || Array.isArray(buffer)) throw new Error("The model contains an invalid buffer entry.");
+    const item = buffer as { byteLength?: unknown; uri?: unknown };
+    if (!Number.isSafeInteger(item.byteLength) || (item.byteLength as number) < 1) throw new Error("The model contains an invalid buffer byteLength.");
+    totalBufferBytes += item.byteLength as number;
+    if (totalBufferBytes > MAX_TOTAL_BUFFER_BYTES) throw new Error("The model's declared buffers exceed the 20 MB decoded-data budget.");
+    if (item.uri !== undefined) {
+      if (typeof item.uri !== "string" || !/^data:/i.test(item.uri)) throw new Error("External model resources are blocked. Use a self-contained GLB or embedded data URIs.");
+      const match = /^data:application\/(?:octet-stream|gltf-buffer);base64,([a-z0-9+/]*={0,2})$/i.exec(item.uri);
+      if (!match) throw new Error("Buffers must use embedded base64 application/octet-stream or model/gltf-buffer data.");
+      const encoded = match[1];
+      const decodedBytes = Math.floor(encoded.length * 3 / 4) - (encoded.endsWith("==") ? 2 : encoded.endsWith("=") ? 1 : 0);
+      if (decodedBytes !== item.byteLength) throw new Error("An embedded buffer length does not match its declared byteLength.");
+      if (decodedBytes > MAX_TOTAL_BUFFER_BYTES) throw new Error("An embedded buffer exceeds the 20 MB decoded-data budget.");
     }
-    if (Array.isArray(collection) && collection.length > maximum) {
-      throw new Error(`The model contains too many ${collectionName} (maximum ${maximum.toLocaleString("en-US")}).`);
+  }
+  if (extension === ".glb" && buffers.length > 0) {
+    const declaredLength = (buffers[0] as { byteLength?: number }).byteLength ?? 0;
+    if (!binaryChunk || declaredLength > binaryChunk.byteLength || binaryChunk.byteLength - declaredLength > 3 || declaredLength > MAX_TOTAL_BUFFER_BYTES) {
+      throw new Error("The GLB binary buffer is missing or exceeds the permitted decoded-data budget.");
+    }
+  }
+
+  for (const view of bufferViews) {
+    if (!view || typeof view !== "object" || Array.isArray(view)) throw new Error("The model contains an invalid bufferView.");
+    const item = view as { buffer?: unknown; byteLength?: unknown; byteOffset?: unknown };
+    if (!Number.isSafeInteger(item.buffer) || (item.buffer as number) < 0 || (item.buffer as number) >= buffers.length ||
+        !Number.isSafeInteger(item.byteLength) || (item.byteLength as number) < 1 ||
+        (item.byteOffset !== undefined && (!Number.isSafeInteger(item.byteOffset) || (item.byteOffset as number) < 0))) {
+      throw new Error("The model contains an invalid bufferView range.");
+    }
+    const buffer = buffers[item.buffer as number] as { byteLength: number };
+    const offset = (item.byteOffset as number | undefined) ?? 0;
+    if (offset + (item.byteLength as number) > buffer.byteLength) throw new Error("A bufferView extends beyond its declared buffer.");
+    if (extension === ".glb" && item.buffer === 0 && binaryChunk && offset + (item.byteLength as number) > binaryChunk.byteLength) {
+      throw new Error("A GLB bufferView extends beyond its binary chunk.");
+    }
+  }
+
+  const imageDimensions = (bytes: Uint8Array): { width: number; height: number } | null => {
+    const u32 = (offset: number) => ((bytes[offset] << 24) | (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3]) >>> 0;
+    if (bytes.length >= 24 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return { width: u32(16), height: u32(20) };
+    if (bytes.length >= 30 && String.fromCharCode(...bytes.subarray(0, 4)) === "RIFF" && String.fromCharCode(...bytes.subarray(8, 12)) === "WEBP") {
+      const kind = String.fromCharCode(...bytes.subarray(12, 16));
+      if (kind === "VP8X") return { width: 1 + bytes[24] + (bytes[25] << 8) + (bytes[26] << 16), height: 1 + bytes[27] + (bytes[28] << 8) + (bytes[29] << 16) };
+      if (kind === "VP8 ") return { width: ((bytes[27] << 8) | bytes[26]) & 0x3fff, height: ((bytes[29] << 8) | bytes[28]) & 0x3fff };
+      if (kind === "VP8L" && bytes.length >= 25) return { width: 1 + bytes[21] + ((bytes[22] & 0x3f) << 8), height: 1 + (bytes[22] >> 6) + (bytes[23] << 2) + ((bytes[24] & 0x0f) << 10) };
+    }
+    if (bytes.length >= 4 && bytes[0] === 0xff && bytes[1] === 0xd8) {
+      let offset = 2;
+      while (offset + 4 <= bytes.length) {
+        if (bytes[offset] !== 0xff) { offset += 1; continue; }
+        const marker = bytes[offset + 1];
+        if (marker === 0xd8 || marker === 0xd9 || (marker >= 0xd0 && marker <= 0xd7)) { offset += 2; continue; }
+        const length = (bytes[offset + 2] << 8) | bytes[offset + 3];
+        if (length < 2 || offset + 2 + length > bytes.length) break;
+        if ([0xc0,0xc1,0xc2,0xc3,0xc5,0xc6,0xc7,0xc9,0xca,0xcb,0xcd,0xce,0xcf].includes(marker)) return { height: (bytes[offset + 5] << 8) | bytes[offset + 6], width: (bytes[offset + 7] << 8) | bytes[offset + 8] };
+        offset += 2 + length;
+      }
+    }
+    return null;
+  };
+  const enforceImageDimensions = (bytes: Uint8Array) => {
+    const dimensions = imageDimensions(bytes);
+    if (!dimensions || dimensions.width < 1 || dimensions.height < 1) throw new Error("An embedded image has an unsupported or unreadable image header.");
+    if (dimensions.width > MAX_TEXTURE_DIMENSION || dimensions.height > MAX_TEXTURE_DIMENSION || dimensions.width * dimensions.height > MAX_TEXTURE_PIXELS) {
+      throw new Error("Images are limited to 4,096 pixels per side and 16,777,216 total pixels.");
+    }
+  };
+
+  let totalEmbeddedImageBytes = 0;
+  for (const image of images) {
+    if (!image || typeof image !== "object" || Array.isArray(image)) throw new Error("The model contains an invalid image entry.");
+    const item = image as { uri?: unknown; bufferView?: unknown; mimeType?: unknown };
+    if (item.uri !== undefined) {
+      if (typeof item.uri !== "string" || !/^data:image\/(?:png|jpeg|webp);base64,/i.test(item.uri)) throw new Error("Images must be embedded base64 PNG, JPEG or WebP data; external resources are blocked.");
+      const payload = item.uri.slice(item.uri.indexOf(",") + 1);
+      const decodedImageBytes = Math.floor(payload.length * 3 / 4) - (payload.endsWith("==") ? 2 : payload.endsWith("=") ? 1 : 0);
+      totalEmbeddedImageBytes += decodedImageBytes;
+      if (totalEmbeddedImageBytes > MAX_TOTAL_BUFFER_BYTES) throw new Error("Embedded images exceed the 20 MB aggregate resource budget.");
+      try {
+        const decoded = atob(payload.slice(0, 87384));
+        enforceImageDimensions(Uint8Array.from(decoded, (character) => character.charCodeAt(0)));
+      } catch (error) {
+        if (error instanceof Error && error.message.startsWith("Images are limited")) throw error;
+        if (error instanceof Error && error.message.startsWith("An embedded image")) throw error;
+        throw new Error("An embedded image contains invalid base64 data.", { cause: error });
+      }
+    } else if (item.bufferView !== undefined) {
+      if (!Number.isSafeInteger(item.bufferView) || (item.bufferView as number) < 0 || (item.bufferView as number) >= bufferViews.length ||
+          !["image/png", "image/jpeg", "image/webp"].includes(String(item.mimeType))) throw new Error("An embedded bufferView image has an invalid reference or unsupported MIME type.");
+      if (extension !== ".glb" || !binaryChunk) throw new Error("BufferView images are supported only in self-contained GLB files.");
+      const view = bufferViews[item.bufferView as number] as { buffer: number; byteOffset?: number; byteLength: number };
+      if (view.buffer !== 0) throw new Error("GLB images must reference the embedded binary buffer.");
+      const offset = view.byteOffset ?? 0;
+      enforceImageDimensions(binaryChunk.subarray(offset, Math.min(offset + view.byteLength, offset + 87384)));
+    } else {
+      throw new Error("Each image must use an embedded data URI or an embedded GLB bufferView.");
     }
   }
 }
-
 type Annotation = { id: string; title: string; detail: string; position: [number, number, number] };
 
 const annotations: Annotation[] = [
