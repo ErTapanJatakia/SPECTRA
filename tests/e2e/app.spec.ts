@@ -388,7 +388,8 @@ test("3D Studio exposes a searchable hierarchy and read-only object properties f
   const model = {
     asset: { version: "2.0" },
     scene: 0,
-    scenes: [{ nodes: [] }]
+    scenes: [{ nodes: [0] }],
+    nodes: [{ name: "Parent", children: [1] }, { name: "Child" }]
   };
   await page.locator("#studio-model-file").setInputFiles({
     name: "inspector-model.gltf",
@@ -426,4 +427,26 @@ test("3D Studio keeps educational annotations session-local and renders user tex
   await page.getByRole("button", { name: "Unload local model" }).click();
   await expect(page.getByText("<img src=x onerror=alert(1)>", { exact: true })).toHaveCount(0);
   await expect(page.getByText("DEMONSTRATION SCENE")).toBeVisible();
+});
+
+
+test("3D Studio hierarchy supports accessible expand and collapse controls", async ({ page }) => {
+  await page.goto("/studio-3d");
+  const model = {
+    asset: { version: "2.0" },
+    scene: 0,
+    scenes: [{ nodes: [0] }],
+    nodes: [{ name: "Parent", children: [1] }, { name: "Child" }]
+  };
+  await page.locator("#studio-model-file").setInputFiles({
+    name: "hierarchy-model.gltf",
+    mimeType: "model/gltf+json",
+    buffer: Buffer.from(JSON.stringify(model))
+  });
+  await expect(page.getByRole("heading", { name: "Scene hierarchy" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Child/ })).toBeVisible();
+  await page.getByRole("button", { name: "Collapse Parent" }).click();
+  await expect(page.getByRole("button", { name: /Child/ })).toHaveCount(0);
+  await page.getByRole("button", { name: "Expand Parent" }).click();
+  await expect(page.getByRole("button", { name: /Child/ })).toBeVisible();
 });
