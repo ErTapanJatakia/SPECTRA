@@ -453,6 +453,10 @@ test("3D Studio hierarchy supports accessible expand and collapse controls", asy
 
 
 test("3D Studio camera presets, world-space inspection and point distance measurements work", async ({ page }) => {
+  page.on("console", (message) => {
+    if (message.type() === "error" || message.type() === "warning") console.log(`[browser ${message.type()}] ${message.text()}`);
+  });
+  page.on("pageerror", (error) => console.log(`[browser pageerror] ${error.stack ?? error.message}`));
   await page.goto("/studio-3d");
   // Use real, embedded triangle geometry so Drei's Center helper has finite
   // bounds while the hierarchy inspector exercises transformed child nodes.
@@ -487,8 +491,11 @@ test("3D Studio camera presets, world-space inspection and point distance measur
     mimeType: "model/gltf+json",
     buffer: Buffer.from(JSON.stringify(model))
   });
-  // Wait for the asynchronous GLTF loader and hierarchy snapshot before interacting
-  // with camera controls; the preset toolbar is visible while the model is still loading.
+  await expect(page.getByText("LOCAL MODEL", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Scene hierarchy" })).toBeVisible();
+  // Capture renderer failures explicitly rather than mistaking an unpopulated hierarchy
+  // for a slow GLTF load.
+  await expect(page.locator(".studio-canvas-error")).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Reference A/ })).toBeVisible();
   await expect(page.getByRole("button", { name: "Front view" })).toBeVisible();
   await page.getByRole("button", { name: "Top view" }).click();
