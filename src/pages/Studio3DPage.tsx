@@ -568,8 +568,8 @@ export default function Studio3DPage() {
             <h2>Scene hierarchy</h2>
             <p>Read-only view of the loaded Three.js scene. Node names are labels, not trusted metadata.</p>
             <label htmlFor="studio-node-search">Search objects<input id="studio-node-search" type="search" value={nodeSearch} onChange={(event) => setNodeSearch(event.target.value)} placeholder="Name, type or material" /></label>
-            <div className="studio-node-tree" role="list" aria-label="Model objects">
-              {visibleModelNodes.map((node) => <button key={node.id} type="button" role="listitem"
+            <div className="studio-node-tree" role="group" aria-label="Model objects">
+              {visibleModelNodes.map((node) => <button key={node.id} type="button"
                 className={`studio-node-item ${selectedNodeId === node.id ? "studio-node-active" : ""}`}
                 style={{ paddingLeft: `${10 + node.id.split(".").length * 12}px` }}
                 onClick={() => setSelectedNodeId(node.id)} aria-pressed={selectedNodeId === node.id}>
