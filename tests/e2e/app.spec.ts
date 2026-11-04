@@ -207,7 +207,7 @@ test("3D Studio keeps the demonstration scene available after a rejected import"
 
 test("3D Studio annotation and viewport controls remain keyboard-operable", async ({ page }) => {
   await page.goto("/studio-3d");
-  const firstAnnotation = page.getByRole("button", { name:"01 Primary structure" });
+  const firstAnnotation = page.getByRole("button", { name:"Primary structure" });
   await expect(firstAnnotation).toBeVisible();
   await firstAnnotation.focus();
   await page.keyboard.press("Enter");
@@ -335,7 +335,7 @@ test("3D Studio respects the reduced-motion preference", async ({ page }) => {
 
 test("3D Studio exposes live rendering telemetry and adaptive quality", async ({ page }) => {
   await page.goto("/studio-3d");
-  const monitor = page.getByRole("status", { name: "3D performance monitor" });
+  const monitor = page.getByRole("group", { name: "3D performance monitor" });
   await expect(monitor).toBeVisible();
   await expect(monitor).toContainText("PERFORMANCE MONITOR");
   await expect(monitor).toContainText("Adaptive render scale");
