@@ -103,10 +103,10 @@ test("3D Studio camera presets, world-space inspection and point distance measur
   await page.getByRole("button", { name: "Top view" }).click();
   await page.getByRole("button", { name: "Isometric view" }).click();
   await page.getByRole("button", { name: /Reference_A/ }).click();
-  await expect(page.getByText(/World position: 3\\.000, 2\\.000, 3\\.000/)).toBeVisible();
+  await expect(page.getByText(/World position: 3\.000, 2\.000, 3\.000/)).toBeVisible();
   await page.getByRole("button", { name: "Set measurement start" }).click();
   await page.getByRole("button", { name: /Reference_B/ }).click();
-  await expect(page.getByText(/Distance from Reference_A: 4\\.000 m/)).toBeVisible();
+  await expect(page.getByText(/Distance from Reference_A: 4\.000 m/)).toBeVisible();
   await page.getByRole("button", { name: "Focus selected" }).click();
   await page.getByRole("button", { name: "Reset 3D viewport camera" }).click();
 });
