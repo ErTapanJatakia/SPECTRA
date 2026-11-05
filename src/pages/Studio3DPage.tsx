@@ -4,7 +4,7 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
-import { Center, Html, OrbitControls, useGLTF } from "@react-three/drei";
+import { Center, OrbitControls, useGLTF } from "@react-three/drei";
 import PageHeading from "../components/PageHeading";
 import Icon from "../components/Icon";
 import { inspectModelHierarchy, type ModelNodeSnapshot } from "../lib/modelInspection";
@@ -253,7 +253,12 @@ class ModelErrorBoundary extends Component<{ children: ReactNode }, { failed: bo
   static getDerivedStateFromError() { return { failed: true }; }
   componentDidCatch(error: Error, info: ErrorInfo) { console.warn("SPECTRA model viewer could not render this asset.", error, info); }
   render() {
-    if (this.state.failed) return <Html center><div className="studio-canvas-error" role="alert">This model could not be rendered. Check the file and try another GLB/glTF asset.</div></Html>;
+    if (this.state.failed) return (
+      <mesh>
+        <icosahedronGeometry args={[0.55, 1]} />
+        <meshBasicMaterial color="#c77d72" wireframe />
+      </mesh>
+    );
     return this.props.children;
   }
 }
@@ -283,10 +288,10 @@ function DemoModel({ showAnnotations, selectedAnnotation, onSelect }: {
         </mesh>
       )))}
       {showAnnotations && annotations.map((item) => (
-        <Html key={item.id} position={item.position} distanceFactor={9} style={{ pointerEvents: "auto" }}>
-          <button className={`studio-hotspot ${selectedAnnotation === item.id ? "studio-hotspot-active" : ""}`}
-            onClick={() => onSelect(item.id)} aria-label={`Show annotation: ${item.title}`}>{item.id}</button>
-        </Html>
+        <mesh key={item.id} position={item.position} onClick={() => onSelect(item.id)}>
+          <sphereGeometry args={[selectedAnnotation === item.id ? 0.105 : 0.075, 16, 12]} />
+          <meshBasicMaterial color={selectedAnnotation === item.id ? "#f0c674" : "#72b8a4"} />
+        </mesh>
       ))}
     </group>
   );
@@ -455,7 +460,7 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
       <directionalLight position={[4, 7, 5]} intensity={2.2} castShadow />
       <directionalLight position={[-4, 2, -3]} intensity={0.8} color="#8bb9d0" />
       <gridHelper args={[12, 24, dark ? "#334b56" : "#c1d0d4", dark ? "#263943" : "#d2dcdf"]} position={[0, -0.8, 0]} />
-      <Suspense fallback={<Html center><div className="studio-loader">Loading model…</div></Html>}>
+      <Suspense fallback={null}>
         <ModelErrorBoundary>
           {modelUrl ? <Center><ImportedModel url={modelUrl} selectedNodeId={selectedNodeId} onHierarchyChange={onHierarchyChange} /></Center> : <DemoModel showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation} onSelect={onSelect} />}
         </ModelErrorBoundary>
