@@ -42,8 +42,8 @@ Prompt 05 is in progress. This document describes the first vertical slice and t
 ## Deferred work
 - Larger, reviewed curriculum and lesson authoring workflow.
 - Additional assessment formats and question-bank governance.
-- Content references attached at lesson and claim level. The peacekeeping principles lesson links to official UN Peacekeeping material for principles, mandate context and standards of conduct; source scope and access date are recorded in lesson metadata.
-- Offline cache verification for lesson assets and future course packages.
+- Claim-level source references across all pathways. The peacekeeping principles lesson links to official UN Peacekeeping material for principles, mandate context and standards of conduct; source scope and access date are recorded in lesson metadata.
+- Offline course packages, broader asset coverage and cache lifecycle/version-transition validation. The current production application-shell cache and an offline Academy assessment flow are covered by Playwright CI.
 - Learner export/import with explicit user control, if justified.
-- Further accessibility review with automated and manual checks.
+- Further accessibility review, including real screen-reader testing and measured colour-contrast checks.
 - No certification, identity management, remote learner tracking or paid services are planned for this foundation stage.
