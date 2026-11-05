@@ -80,6 +80,9 @@ test("3D Studio camera presets, world-space inspection and point distance measur
   // It remains in the DOM as native canvas fallback content even when WebGL works,
   // so asserting that the node is absent would incorrectly fail healthy renderers.
   await expect(page.locator("canvas").first()).toHaveAttribute("role", "application");
+  if (!("canvas" in rendererDiagnostics)) {
+    throw new Error(`WebGL renderer diagnostics failed: ${rendererDiagnostics.diagnosticError}`);
+  }
   expect(rendererDiagnostics).toMatchObject({
     canvas: {
       onCreatedMarker: "application",
