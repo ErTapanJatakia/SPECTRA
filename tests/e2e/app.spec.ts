@@ -458,8 +458,8 @@ test("3D Studio camera presets, world-space inspection and point distance measur
   });
   page.on("pageerror", (error) => console.log(`[browser pageerror] ${error.stack ?? error.message}`));
   await page.goto("/studio-3d");
-  // Use real, embedded triangle geometry so Drei's Center helper has finite
-  // bounds while the hierarchy inspector exercises transformed child nodes.
+  // Use real, embedded triangle geometry so the spatial inspector can measure
+  // finite world-space bounds while exercising transformed child nodes.
   const positions = Buffer.from(new Float32Array([
     0, 0, 0,
     1, 0, 0,
