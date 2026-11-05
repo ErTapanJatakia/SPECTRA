@@ -1,0 +1,37 @@
+.peacekeeping-status{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;color:var(--muted);background:var(--surface);font-size:10px;font-weight:750;letter-spacing:.07em}
+.peacekeeping-intro{display:flex;align-items:flex-start;gap:16px;padding:20px;border:1px solid var(--border);border-radius:13px;background:var(--surface)}
+.peacekeeping-intro-mark{display:grid;place-items:center;width:50px;height:50px;flex:0 0 50px;border:1px solid var(--border-strong);border-radius:12px;color:var(--accent);background:var(--accent-soft)}
+.peacekeeping-intro h2{max-width:760px;margin:5px 0 8px;font-size:18px;line-height:1.4;letter-spacing:-.025em}
+.peacekeeping-intro p{max-width:900px;margin:0;color:var(--muted);font-size:12px;line-height:1.75}
+.peacekeeping-academy-link{display:inline-flex;align-items:center;gap:8px;margin-top:14px}
+.peacekeeping-section{display:flex;flex-direction:column;gap:13px}
+.peacekeeping-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.peacekeeping-section-heading h2{margin:5px 0 0;font-size:19px;letter-spacing:-.025em}
+.peacekeeping-count{color:var(--subtle);font-size:10px;font-weight:750;letter-spacing:.08em}
+.peacekeeping-curriculum-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.peacekeeping-area-card{display:flex;flex-direction:column;min-width:0;padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+.peacekeeping-area-top{display:flex;align-items:center;justify-content:space-between;color:var(--accent)}
+.peacekeeping-area-top span{font-size:11px;font-weight:850;letter-spacing:.1em}
+.peacekeeping-area-card h3{margin:13px 0 7px;font-size:13px;line-height:1.45}
+.peacekeeping-area-card>p{margin:0;color:var(--muted);font-size:11px;line-height:1.7}
+.peacekeeping-outcomes{margin-top:13px;padding-top:11px;border-top:1px solid var(--border)}
+.peacekeeping-outcomes strong{font-size:10px}
+.peacekeeping-outcomes ul{display:flex;flex-direction:column;gap:6px;margin:8px 0 0;padding-left:17px;color:var(--muted);font-size:10px;line-height:1.6}
+.peacekeeping-area-card .peacekeeping-boundary{margin-top:auto;padding-top:12px;color:var(--subtle);font-size:10px;line-height:1.6}
+.peacekeeping-boundary strong{color:var(--muted)}
+.peacekeeping-resource-note{max-width:1000px;margin:-3px 0 0;color:var(--muted);font-size:11px;line-height:1.7}
+.peacekeeping-resource-list{display:flex;flex-direction:column;gap:0;margin:0;padding:0;list-style:none;border:1px solid var(--border);border-radius:12px;background:var(--surface)}
+.peacekeeping-resource-list li{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 15px;border-bottom:1px solid var(--border)}
+.peacekeeping-resource-list li:last-child{border-bottom:0}
+.peacekeeping-resource-list li>div{min-width:0}
+.peacekeeping-resource-list a{color:var(--accent);font-size:11px;font-weight:750;text-decoration:underline;text-underline-offset:3px}
+.peacekeeping-resource-list li span{display:block;margin-top:3px;color:var(--subtle);font-size:10px}
+.peacekeeping-resource-list li p{margin:5px 0 0;color:var(--muted);font-size:10px;line-height:1.6}
+.peacekeeping-resource-list .peacekeeping-resource-open{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border:1px solid var(--border);border-radius:8px;text-decoration:none}
+.peacekeeping-resource-list a:focus-visible,.peacekeeping-page a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.peacekeeping-governance{display:flex;align-items:flex-start;gap:12px;padding:15px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2)}
+.peacekeeping-governance>svg{flex:0 0 auto;color:var(--accent)}
+.peacekeeping-governance h2{margin:0;font-size:12px}
+.peacekeeping-governance p{margin:6px 0 0;color:var(--muted);font-size:10px;line-height:1.7}
+@media(max-width:1000px){.peacekeeping-curriculum-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.peacekeeping-intro{padding:14px}.peacekeeping-intro-mark{width:40px;height:40px;flex-basis:40px}.peacekeeping-section-heading{align-items:flex-start;flex-direction:column}.peacekeeping-curriculum-grid{grid-template-columns:1fr}.peacekeeping-resource-list li{align-items:flex-start}.peacekeeping-resource-list .peacekeeping-resource-open{margin-top:2px}}
