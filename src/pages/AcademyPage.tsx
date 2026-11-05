@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import PageHeading from "../components/PageHeading";
 import Icon from "../components/Icon";
 import { learningPathways, type LearningPathway, type Lesson } from "../data/academy";
@@ -22,7 +22,6 @@ export default function AcademyPage() {
 
   const pathway = learningPathways.find((item) => item.id === selectedPathwayId) ?? learningPathways[0];
   const lesson = pathway.lessons.find((item) => item.id === selectedLessonId) ?? pathway.lessons[0];
-  const pathwayProgress = useMemo(() => getPathwayProgress(pathway, progress), [pathway, progress]);
   const allQuestionsAnswered = lesson.questions.every((question) => Boolean(answers[question.id]));
   const score = lesson.questions.length ? Math.round((lesson.questions.filter((question) => answers[question.id] === question.correctOptionId).length / lesson.questions.length) * 100) : 0;
   const lessonState = progress.lessons[lesson.id];
