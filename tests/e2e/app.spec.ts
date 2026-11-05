@@ -480,3 +480,13 @@ test("Learning Academy can switch pathways and retain separate lesson progress",
   await expect(page.getByRole("heading", { name:"Principles, mandate and conduct" })).toBeVisible();
   await expect(page.getByText("Three foundational principles")).toBeVisible();
 });
+
+
+test("Peacekeeping lesson displays official, scoped source references", async ({ page }) => {
+  await page.goto("/academy");
+  await page.getByRole("button", { name:/Peacekeeping Foundations/ }).click();
+  await expect(page.getByRole("heading", { name:"Sources and further reading" })).toBeVisible();
+  await expect(page.getByRole("link", { name:"Principles of peacekeeping" })).toHaveAttribute("href", "https://peacekeeping.un.org/en/node/132275");
+  await expect(page.getByRole("link", { name:"Mandates and the legal basis for peacekeeping" })).toBeVisible();
+  await expect(page.getByRole("link", { name:"Standards of conduct" })).toBeVisible();
+});
