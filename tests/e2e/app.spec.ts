@@ -512,3 +512,32 @@ test("Learning Academy explains the limits of browser-local progress privacy", a
   await expect(page.getByText(/Local storage is not encrypted/)).toBeVisible();
   await expect(page.getByText(/not sent to a SPECTRA server/)).toBeVisible();
 });
+
+
+test("Learning Academy remains usable at a narrow mobile viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/academy");
+  await expect(page.getByRole("heading", { name: "Learning Academy" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Responsible Defence Technology Literacy/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Test your understanding" })).toBeVisible();
+  const dimensions = await page.evaluate(() => ({
+    viewport: document.documentElement.clientWidth,
+    content: document.documentElement.scrollWidth
+  }));
+  expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport);
+});
+
+test("Learning Academy remains readable when browser local storage is unavailable", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      get() { throw new DOMException("Storage is blocked", "SecurityError"); }
+    });
+  });
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+  await page.goto("/academy");
+  await expect(page.getByRole("heading", { name: "Learning Academy" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Test your understanding" })).toBeVisible();
+  expect(pageErrors).toEqual([]);
+});
