@@ -28,7 +28,7 @@ The project is intended to help security professionals, defence-sector personnel
 
 SPECTRA is being designed as a **supplementary learning and familiarisation resource**. It is not an operational military system, a weapons proficiency programme, or a replacement for authorised professional, national, or United Nations training.
 
-> **Project stage:** Project Charter (Prompt 00), Architecture & Product Blueprint (Prompt 01), Repository Bootstrap & Design System (Prompt 02), the initial Military Systems Knowledge Base (Prompt 03), and the Interactive 3D Studio (Prompt 04) are implemented. The current catalogue remains a curated starter sample; the Learning Academy and peacekeeping curriculum remain planned for their dedicated stages.
+> **Project stage:** Project Charter (Prompt 00), Architecture & Product Blueprint (Prompt 01), Repository Bootstrap & Design System (Prompt 02), the initial Military Systems Knowledge Base (Prompt 03), and the Interactive 3D Studio (Prompt 04) are implemented. The current catalogue remains a curated starter sample. The Learning Academy is in progress, with its first local-first learning pathways and assessments under review in PR #9; the broader peacekeeping curriculum remains planned for its dedicated stage.
 
 ## Mission
 
@@ -101,7 +101,7 @@ The product blueprint anticipates:
 - A responsive interface for desktop, tablet, and mobile devices.
 - Internationalisation readiness, with English as the initial interface language.
 
-All such capabilities remain planned until implemented, tested, and documented in the repository.
+Implemented capabilities are identified in the development roadmap below. Remaining planned capabilities will be treated as delivered only after implementation, testing, and documentation.
 
 ## Interactive 3D learning
 
