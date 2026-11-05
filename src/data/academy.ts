@@ -13,6 +13,7 @@ export type Lesson = {
   objectives: string[];
   sections: { heading: string; body: string }[];
   questions: QuizQuestion[];
+  references?: { title: string; publisher: string; url: string; scope: string; accessedOn: string }[];
 };
 export type LearningPathway = {
   id: string;
@@ -111,6 +112,11 @@ export const learningPathways: LearningPathway[] = [
         questions: [
           { id: "peace-1", prompt: "Which set names the three commonly stated basic UN peacekeeping principles?", options: [{ id:"a", text:"Speed, secrecy and surprise" }, { id:"b", text:"Consent of the parties, impartiality, and non-use of force except in self-defence and defence of the mandate" }, { id:"c", text:"Neutrality, territorial expansion and unrestricted force" }], correctOptionId:"b", explanation:"These are the three foundational principles commonly used to explain UN peacekeeping." },
           { id: "peace-2", prompt: "Can a general online learning module replace mission-specific authorised training?", options: [{ id:"a", text:"No; it is supplementary and cannot replace official instructions or qualifications" }, { id:"b", text:"Yes, if the learner passes the quiz" }, { id:"c", text:"Yes, if the learner has professional experience" }], correctOptionId:"a", explanation:"SPECTRA is not an official UN programme, national qualification or substitute for authorised training." }
+        ],
+        references: [
+          { title: "Principles of peacekeeping", publisher: "United Nations Peacekeeping", url: "https://peacekeeping.un.org/en/node/132275", scope: "The three basic principles and their interpretation", accessedOn: "2026-11-05" },
+          { title: "Mandates and the legal basis for peacekeeping", publisher: "United Nations Peacekeeping", url: "https://peacekeeping.un.org/en/mandates-and-the-legal-basis-for-peacekeeping", scope: "Security Council mandates and mission-specific tasks", accessedOn: "2026-11-05" },
+          { title: "Standards of conduct", publisher: "United Nations Peacekeeping", url: "https://peacekeeping.un.org/en/standards-of-conduct", scope: "Professional conduct and discipline", accessedOn: "2026-11-05" }
         ]
       }
     ]
