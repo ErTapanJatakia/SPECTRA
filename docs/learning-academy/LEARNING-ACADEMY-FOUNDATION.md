@@ -1,7 +1,7 @@
 # Learning Academy — Foundation Release
 
 ## Status
-Prompt 05 is in progress. This document describes the first vertical slice and the guardrails for subsequent work.
+The Learning Academy foundation (Prompt 05) is implemented and merged in PR #9. This document records the delivered foundation, its guardrails and follow-up work that remains outside the foundation release.
 
 ## Initial pathways
 1. Responsible Defence Technology Literacy — non-operational scope, source provenance and confidence.
