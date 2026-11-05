@@ -10,14 +10,21 @@ test("Learning Academy reloads and remains usable offline after its first online
   });
   await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
 
+  // The first document load can finish before the newly registered worker controls
+  // the page. Reload once while online so the worker can cache the app's JS and CSS.
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Learning Academy" })).toBeVisible();
+
   const cachedResources = await page.evaluate(async () => {
     const keys = await caches.keys();
-    const cache = await caches.open(keys.find((key) => key.startsWith("spectra-shell-")) ?? "");
+    const shellKey = keys.find((key) => key.startsWith("spectra-shell-"));
+    if (!shellKey) throw new Error("The SPECTRA application-shell cache was not created.");
+    const cache = await caches.open(shellKey);
     return (await cache.keys()).map((request) => new URL(request.url).pathname);
   });
   expect(cachedResources).toContain("/index.html");
-  expect(cachedResources.some((path) => /\.js$/.test(path))).toBe(true);
-  expect(cachedResources.some((path) => /\.css$/.test(path))).toBe(true);
+  expect(cachedResources.some((path) => /\\.js$/i.test(path))).toBe(true);
+  expect(cachedResources.some((path) => /\\.css$/i.test(path))).toBe(true);
 
   await context.setOffline(true);
   await page.reload();
