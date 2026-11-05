@@ -156,7 +156,7 @@ export default function PeacekeepingPage() {
           {resources.map((resource) => (
             <li key={resource.url}>
               <div><a href={resource.url} target="_blank" rel="noreferrer">{resource.title}</a><span>{resource.publisher}</span><p>{resource.scope}</p></div>
-              <a className="peacekeeping-resource-open" href={resource.url} target="_blank" rel="noreferrer" aria-label={`Open resource: ${resource.title}`}><Icon name="external-link" size={15} /></a>
+              <a className="peacekeeping-resource-open" href={resource.url} target="_blank" rel="noreferrer" aria-label={`Open resource: ${resource.title}`}><Icon name="external" size={15} /></a>
             </li>
           ))}
         </ul>
