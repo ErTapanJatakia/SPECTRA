@@ -128,3 +128,9 @@
   .editorial-note-panel { flex-direction: column; }
   .filter-footer { align-items: flex-start; }
 }
+
+/* Keep Academy keyboard focus visible even when component styles are overridden. */
+.academy-page .academy-lesson-nav .academy-lesson-link:focus {
+  outline: 3px solid currentColor !important;
+  outline-offset: 3px !important;
+}
