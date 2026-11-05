@@ -90,6 +90,14 @@ test("3D Studio camera presets, world-space inspection and point distance measur
     }
   });
   expect(rendererDiagnostics.canvas.context.version).toContain("WebGL 2.0");
+  // Poll the actual hierarchy state and include the import error panel in the
+  // failure payload. This distinguishes a loader failure from a stale/early
+  // locator assertion without weakening the expected hierarchy requirement.
+  await expect.poll(async () => JSON.stringify({
+    hierarchy: await page.locator(".studio-node-tree").innerText().catch(() => "<missing tree>"),
+    importError: await page.locator(".studio-error").allInnerTexts(),
+    pageText: (await page.locator("body").innerText()).slice(-1800)
+  }), { timeout: 5000 }).toContain("Reference A");
   await expect(page.getByRole("button", { name: /Reference A/ })).toBeVisible();
   await expect(page.getByRole("button", { name: "Front view" })).toBeVisible();
   await page.getByRole("button", { name: "Top view" }).click();
