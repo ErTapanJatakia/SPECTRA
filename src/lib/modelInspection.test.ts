@@ -54,5 +54,6 @@ describe("inspectModelHierarchy", () => {
     expect(snapshot[1].boundsSize?.[0]).toBeCloseTo(2);
     expect(snapshot[1].boundsSize?.[1]).toBeCloseTo(4);
     expect(snapshot[1].boundsSize?.[2]).toBeCloseTo(6);
+    expect(snapshot[1].boundsCenter).toEqual([11, 2, 3]);
   });
 });
