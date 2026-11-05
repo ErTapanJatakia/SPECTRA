@@ -7,6 +7,9 @@ export type ModelNodeSnapshot = {
   type: string;
   visible: boolean;
   position: [number, number, number];
+  worldPosition: [number, number, number];
+  boundsSize?: [number, number, number];
+  boundsCenter?: [number, number, number];
   rotation: [number, number, number];
   scale: [number, number, number];
   isMesh: boolean;
@@ -28,6 +31,7 @@ const finiteTuple = (values: number[]): [number, number, number] => [
  */
 export function inspectModelHierarchy(root: THREE.Object3D, maxNodes = 2500): ModelNodeSnapshot[] {
   const limit = Number.isSafeInteger(maxNodes) && maxNodes > 0 ? Math.min(maxNodes, 2500) : 2500;
+  root.updateMatrixWorld(true);
   const result: ModelNodeSnapshot[] = [];
   const stack: Array<{ object: THREE.Object3D; id: string; parentId: string | null }> = [
     { object: root, id: "0", parentId: null }
@@ -44,6 +48,10 @@ export function inspectModelHierarchy(root: THREE.Object3D, maxNodes = 2500): Mo
           .map((material) => material.name?.trim() || material.type)
       : undefined;
     const position = finiteTuple(object.position.toArray().slice(0, 3));
+    const worldPosition = finiteTuple(object.getWorldPosition(new THREE.Vector3()).toArray());
+    const bounds = isMesh ? new THREE.Box3().setFromObject(object) : undefined;
+    const boundsSize = bounds ? finiteTuple(bounds.getSize(new THREE.Vector3()).toArray()) : undefined;
+    const boundsCenter = bounds ? finiteTuple(bounds.getCenter(new THREE.Vector3()).toArray()) : undefined;
     const rotation = finiteTuple([object.rotation.x, object.rotation.y, object.rotation.z]);
     const scale = finiteTuple(object.scale.toArray().slice(0, 3));
 
@@ -54,6 +62,8 @@ export function inspectModelHierarchy(root: THREE.Object3D, maxNodes = 2500): Mo
       type: object.type,
       visible: object.visible,
       position,
+      worldPosition,
+      ...(isMesh ? { boundsSize, boundsCenter } : {}),
       rotation,
       scale,
       isMesh,
