@@ -506,5 +506,5 @@ test("3D Studio camera presets, world-space inspection and point distance measur
   await page.getByRole("button", { name: /Reference B/ }).click();
   await expect(page.getByText(/Distance from Reference A: 4\.000 m/)).toBeVisible();
   await page.getByRole("button", { name: "Focus selected" }).click();
-  await page.getByRole("button", { name: "Fit scene" }).click();
+  await page.getByRole("button", { name: "Reset 3D viewport camera" }).click();
 });
