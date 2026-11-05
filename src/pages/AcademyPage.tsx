@@ -80,7 +80,7 @@ export default function AcademyPage() {
           <div className="academy-nav-heading"><span className="eyebrow">COURSE CONTENT</span><h2>{pathway.title}</h2></div>
           {pathway.lessons.map((item, index) => {
             const itemProgress = progress.lessons[item.id];
-            return <button type="button" key={item.id} className={`academy-lesson-link ${item.id === lesson.id ? "academy-lesson-active" : ""}`} onClick={() => chooseLesson(item)}>
+            return <button type="button" key={item.id} className={`academy-lesson-link ${item.id === lesson.id ? "academy-lesson-active" : ""}`} aria-pressed={item.id === lesson.id} onClick={() => chooseLesson(item)}>
               <span className="academy-lesson-number">{itemProgress?.completed ? <Icon name="check" size={15} /> : String(index + 1).padStart(2, "0")}</span>
               <span><strong>{item.title}</strong><small>{item.durationMinutes} min · {itemProgress?.completed ? "Completed" : "Not completed"}</small></span>
             </button>;
