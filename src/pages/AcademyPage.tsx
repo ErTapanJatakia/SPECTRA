@@ -92,6 +92,7 @@ export default function AcademyPage() {
           <div className="academy-lesson-header"><div><span className="eyebrow">LESSON · {lesson.durationMinutes} MINUTES</span><h2>{lesson.title}</h2></div>{lessonState?.completed && <span className="academy-complete-pill"><Icon name="check" size={13} /> Completed</span>}</div>
           <div className="academy-objectives"><strong>By the end of this lesson, you should be able to:</strong><ul>{lesson.objectives.map((objective) => <li key={objective}>{objective}</li>)}</ul></div>
           <div className="academy-reading">{lesson.sections.map((section, index) => <section key={section.heading}><span className="academy-reading-index">0{index + 1}</span><div><h3>{section.heading}</h3><p>{section.body}</p></div></section>)}</div>
+          {lesson.references && <section className="academy-references" aria-labelledby="academy-references-heading"><h3 id="academy-references-heading">Sources and further reading</h3><ul>{lesson.references.map((reference) => <li key={reference.url}><a href={reference.url} target="_blank" rel="noreferrer">{reference.title}</a><span>{reference.publisher} · {reference.scope} · Accessed {reference.accessedOn}</span></li>)}</ul></section>}
 
           <div className="academy-assessment" aria-labelledby="assessment-heading">
             <div className="academy-assessment-heading"><div><span className="eyebrow">KNOWLEDGE CHECK</span><h3 id="assessment-heading">Test your understanding</h3></div><span>{lesson.questions.length} questions</span></div>
