@@ -497,7 +497,8 @@ test("Learning Academy lesson navigation exposes selection state and keyboard fo
   const activeLesson = page.getByRole("button", { name:/Technology literacy and responsible scope/ });
   await expect(activeLesson).toHaveAttribute("aria-pressed", "true");
   const nextLesson = page.getByRole("button", { name:/Source provenance and confidence/ });
-  await nextLesson.focus();
+  await activeLesson.focus();
+  await page.keyboard.press("Tab");
   await expect(nextLesson).toBeFocused();
   await expect(nextLesson).toHaveCSS("outline-style", "solid");
   await nextLesson.click();
