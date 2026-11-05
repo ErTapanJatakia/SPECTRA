@@ -28,7 +28,7 @@ The project is intended to help security professionals, defence-sector personnel
 
 SPECTRA is being designed as a **supplementary learning and familiarisation resource**. It is not an operational military system, a weapons proficiency programme, or a replacement for authorised professional, national, or United Nations training.
 
-> **Project stage:** Project Charter (Prompt 00), Architecture & Product Blueprint (Prompt 01), Repository Bootstrap & Design System (Prompt 02), the initial Military Systems Knowledge Base (Prompt 03), and the Interactive 3D Studio (Prompt 04) are implemented. The current catalogue remains a curated starter sample. The Learning Academy is in progress, with its first local-first learning pathways and assessments under review in PR #9; the broader peacekeeping curriculum remains planned for its dedicated stage.
+> **Project stage:** Project Charter (Prompt 00), Architecture & Product Blueprint (Prompt 01), Repository Bootstrap & Design System (Prompt 02), the initial Military Systems Knowledge Base (Prompt 03), and the Interactive 3D Studio foundation (Prompt 04) are implemented. The current catalogue remains a curated starter sample. The Learning Academy foundation (Prompt 05) is implemented and merged; curriculum expansion, broader accessibility validation and other follow-up work remain. The dedicated peacekeeping curriculum is still planned for its own stage.
 
 ## Mission
 
@@ -195,13 +195,13 @@ The repository includes original concept illustrations prepared for SPECTRA:
 | 02 | Repository foundation and design system | Implemented; CI passed |
 | 03 | Military systems knowledge base | Implemented; five-country, eleven-record sample and validator committed |
 | 04 | Interactive 3D Studio | Implemented; local model validation, inspection and educational annotations; spatial navigation deferred in PR #8 |
-| 05 | Learning Academy | In progress; initial local-first pathways, lessons and assessments in PR #9 |
+| 05 | Learning Academy | Foundation implemented and merged (PR #9); curriculum expansion and follow-up validation remain |
 | 06 | Peacekeeping education | Not started |
 | 07 | Editorial and research framework | Not started |
 | 08 | Advanced features and offline learning | Not started |
 | 09 | Security, quality assurance, and release readiness | Not started |
 
-Prompt 05 begins with three introductory pathways, structured lessons, formative knowledge checks and browser-local learner progress. The initial implementation is a foundation release, not a complete curriculum or professional qualification. See [Learning Academy Foundation](docs/learning-academy/LEARNING-ACADEMY-FOUNDATION.md).
+Prompt 05 delivered three introductory pathways, structured lessons, formative knowledge checks and browser-local learner progress. The merged implementation is a foundation release, not a complete curriculum or professional qualification. Further curriculum, accessibility, source-verification and offline-learning work remains subject to separate scope and validation. See [Learning Academy Foundation](docs/learning-academy/LEARNING-ACADEMY-FOUNDATION.md).
 
 The project will proceed through individually reviewed and approved development stages. No milestone should be treated as complete until its acceptance criteria have been met and the relevant work is committed.
 
