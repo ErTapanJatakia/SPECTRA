@@ -207,15 +207,15 @@ test("3D Studio keeps the demonstration scene available after a rejected import"
 
 test("3D Studio annotation and viewport controls remain keyboard-operable", async ({ page }) => {
   await page.goto("/studio-3d");
-  const firstAnnotation = page.getByRole("button", { name:"Primary structure" });
+  const firstAnnotation = page.getByRole("button", { name:"Primary structure", exact:true });
   await expect(firstAnnotation).toBeVisible();
   await firstAnnotation.focus();
   await page.keyboard.press("Enter");
   await expect(page.getByText("A visual reference point for understanding the model's overall form.")).toBeVisible();
   await page.getByRole("button", { name:/Hide labels/ }).click();
-  await expect(page.getByRole("button", { name:"Show annotation: Primary structure" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name:"Select scene annotation hotspot 01" })).toHaveCount(0);
   await page.getByRole("button", { name:/Show labels/ }).click();
-  await expect(page.getByRole("button", { name:"Show annotation: Primary structure" })).toBeVisible();
+  await expect(page.getByRole("button", { name:"Select scene annotation hotspot 01" })).toBeVisible();
 });
 
 
