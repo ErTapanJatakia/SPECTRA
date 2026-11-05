@@ -23,6 +23,21 @@ export const CAMERA_PRESETS = {
 
 export type CameraPreset = keyof typeof CAMERA_PRESETS;
 
+/** Calculates a conservative perspective-camera distance for a world-space bounding box. */
+export function cameraDistanceForBounds(
+  boundsSize: SpatialPoint,
+  fieldOfViewDegrees = 42,
+  padding = 1.2
+): number {
+  const dimensions = boundsSize.map((value) => Number.isFinite(value) ? Math.max(0, value) : 0);
+  const radius = Math.hypot(...dimensions) / 2;
+  if (!Number.isFinite(radius) || radius <= 0) return 7;
+  const safeFov = Number.isFinite(fieldOfViewDegrees) ? Math.min(120, Math.max(10, fieldOfViewDegrees)) : 42;
+  const safePadding = Number.isFinite(padding) ? Math.min(3, Math.max(1, padding)) : 1.2;
+  const distance = radius / Math.sin(safeFov * Math.PI / 360) * safePadding;
+  return Math.min(10_000, Math.max(2, Number.isFinite(distance) ? distance : 7));
+}
+
 export function cameraPositionForPreset(
   target: SpatialPoint,
   preset: CameraPreset,
@@ -30,7 +45,7 @@ export function cameraPositionForPreset(
 ): SpatialPoint {
   const direction = CAMERA_PRESETS[preset];
   const length = Math.hypot(...direction);
-  const safeDistance = Number.isFinite(distance) ? Math.min(18, Math.max(2, distance)) : 7;
+  const safeDistance = Number.isFinite(distance) ? Math.min(10_000, Math.max(2, distance)) : 7;
   return [
     target[0] + direction[0] / length * safeDistance,
     target[1] + direction[1] / length * safeDistance,
