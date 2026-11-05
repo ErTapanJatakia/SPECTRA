@@ -36,7 +36,7 @@ describe("learning progress", () => {
   });
 
   it("safely preserves unusual lesson identifiers without modifying object prototypes", () => {
-    const parsed = parseLearningProgress(String.raw`{"version":1,"lessons":{"__proto__":{"completed":false,"bestScore":40,"attempts":1}}}`);
+    const parsed = parseLearningProgress('{"version":1,"lessons":{"__proto__":{"completed":false,"bestScore":40,"attempts":1}}}');
     expect(Object.prototype.hasOwnProperty.call(parsed.lessons, "__proto__")).toBe(true);
     expect(Object.getPrototypeOf(parsed.lessons)).toBe(Object.prototype);
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
