@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("Learning Academy reloads and remains usable offline after its first online visit", async ({ page, context }) => {
+test("Learning Academy reloads and supports an assessment offline after its first online visit", async ({ page, context }) => {
   await page.goto("/academy");
   await expect(page.getByRole("heading", { name: "Learning Academy" })).toBeVisible();
 
@@ -32,5 +32,10 @@ test("Learning Academy reloads and remains usable offline after its first online
   await expect(page.getByRole("heading", { name: "Learning Academy" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Choose a pathway" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Test your understanding" })).toBeVisible();
-  await expect(page.getByRole("button", { name: /Submit answers/ })).toBeDisabled();
+
+  // Confirm that cached lesson content and assessment interactions work without network access.
+  await page.getByLabel(/Explaining a platform's historical context/).check();
+  await page.getByLabel(/No; safety, accuracy, rights/).check();
+  await page.getByRole("button", { name: /Submit answers/ }).click();
+  await expect(page.getByText("Lesson completed. Well done.")).toBeVisible();
 });
