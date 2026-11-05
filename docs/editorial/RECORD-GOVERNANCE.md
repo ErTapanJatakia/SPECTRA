@@ -1,5 +1,9 @@
 # SPECTRA Record Publication & Editorial Governance
 
+## Companion editorial standards
+
+For claim-level evidence mapping, source evaluation, uncertainty handling, time-sensitive claims, review responsibilities and the pre-publication checklist, see [Editorial Standards & Research Review](EDITORIAL-STANDARDS.md). This companion document supplements the governance rules below; it does not change the publication states or confidence classifications.
+
 ## Publication workflow
 
 `draft → research-review → safety-review → rights-review → approved → published`
