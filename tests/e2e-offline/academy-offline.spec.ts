@@ -1,0 +1,41 @@
+import { expect, test } from "@playwright/test";
+
+test("Learning Academy reloads and supports an assessment offline after its first online visit", async ({ page, context }) => {
+  await page.goto("/academy");
+  await expect(page.getByRole("heading", { name: "Learning Academy" })).toBeVisible();
+
+  await page.evaluate(async () => {
+    if (!("serviceWorker" in navigator)) throw new Error("Service workers are unavailable.");
+    await navigator.serviceWorker.ready;
+  });
+  await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+
+  // Reload under service-worker control so application assets are fetched and cached.
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Learning Academy" })).toBeVisible();
+
+  const cachedResources = await page.evaluate(async () => {
+    const keys = await caches.keys();
+    const shellKey = keys.find((key) => key.startsWith("spectra-shell-"));
+    if (!shellKey) throw new Error("The SPECTRA application-shell cache was not created.");
+    const cache = await caches.open(shellKey);
+    return (await cache.keys()).map((request) => new URL(request.url).pathname);
+  });
+
+  expect(cachedResources).toContain("/index.html");
+  expect(cachedResources.some((path) => path.toLowerCase().endsWith(".js"))).toBe(true);
+  expect(cachedResources.some((path) => path.toLowerCase().endsWith(".css"))).toBe(true);
+
+  await context.setOffline(true);
+  await page.reload();
+
+  await expect(page.getByRole("heading", { name: "Learning Academy" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Choose a pathway" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Test your understanding" })).toBeVisible();
+
+  // Confirm that cached lesson content and assessment interactions work without network access.
+  await page.getByLabel(/Explaining a platform's historical context/).check();
+  await page.getByLabel(/No; safety, accuracy, rights/).check();
+  await page.getByRole("button", { name: /Submit answers/ }).click();
+  await expect(page.getByText("Lesson completed. Well done.")).toBeVisible();
+});

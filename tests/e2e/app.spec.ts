@@ -450,3 +450,94 @@ test("3D Studio hierarchy supports accessible expand and collapse controls", asy
   await page.getByRole("button", { name: "Expand Parent" }).click();
   await expect(page.getByRole("button", { name: /Child/ })).toBeVisible();
 });
+
+
+test("Learning Academy presents pathways and lesson assessments", async ({ page }) => {
+  await page.goto("/academy");
+  await expect(page.getByRole("heading", { name:"Learning Academy" })).toBeVisible();
+  await expect(page.getByRole("heading", { name:"Choose a pathway" })).toBeVisible();
+  await expect(page.getByRole("heading", { name:"Technology literacy and responsible scope" })).toBeVisible();
+  await expect(page.getByRole("heading", { name:"Test your understanding" })).toBeVisible();
+  await expect(page.getByRole("button", { name:/Submit answers/ })).toBeDisabled();
+});
+
+test("Learning Academy records a passing assessment locally and can reset it", async ({ page }) => {
+  await page.goto("/academy");
+  await page.getByLabel(/Explaining a platform's historical context/).check();
+  await page.getByLabel(/No; safety, accuracy, rights/).check();
+  await page.getByRole("button", { name:/Submit answers/ }).click();
+  await expect(page.getByText("Lesson completed. Well done.")).toBeVisible();
+  await expect(page.getByText("1 of 2 lessons")).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("1 of 2 lessons")).toBeVisible();
+  await page.getByRole("button", { name:"Reset local progress" }).click();
+  await expect(page.getByText("0 of 2 lessons")).toBeVisible();
+});
+
+test("Learning Academy can switch pathways and retain separate lesson progress", async ({ page }) => {
+  await page.goto("/academy");
+  await page.getByRole("button", { name:/Peacekeeping Foundations/ }).click();
+  await expect(page.getByRole("heading", { name:"Principles, mandate and conduct" })).toBeVisible();
+  await expect(page.getByText("Three foundational principles")).toBeVisible();
+});
+
+
+test("Peacekeeping lesson displays official, scoped source references", async ({ page }) => {
+  await page.goto("/academy");
+  await page.getByRole("button", { name:/Peacekeeping Foundations/ }).click();
+  await expect(page.getByRole("heading", { name:"Sources and further reading" })).toBeVisible();
+  await expect(page.getByRole("link", { name:"Principles of peacekeeping" })).toHaveAttribute("href", "https://peacekeeping.un.org/en/node/132275");
+  await expect(page.getByRole("link", { name:"Mandates and the legal basis for peacekeeping" })).toBeVisible();
+  await expect(page.getByRole("link", { name:"Standards of conduct" })).toBeVisible();
+});
+
+
+test("Learning Academy lesson navigation exposes selection state and keyboard focus", async ({ page }) => {
+  await page.goto("/academy");
+  const activeLesson = page.getByRole("button", { name:/Technology literacy and responsible scope/ });
+  await expect(activeLesson).toHaveAttribute("aria-pressed", "true");
+  const nextLesson = page.getByRole("button", { name:/Source provenance and confidence/ });
+  await activeLesson.focus();
+  await page.keyboard.press("Tab");
+  await expect(nextLesson).toBeFocused();
+  await expect(nextLesson).toHaveCSS("outline-style", "solid");
+  await nextLesson.click();
+  await expect(nextLesson).toHaveAttribute("aria-pressed", "true");
+  await expect(activeLesson).toHaveAttribute("aria-pressed", "false");
+});
+
+
+test("Learning Academy explains the limits of browser-local progress privacy", async ({ page }) => {
+  await page.goto("/academy");
+  await expect(page.getByText(/Local storage is not encrypted/)).toBeVisible();
+  await expect(page.getByText(/not sent to a SPECTRA server/)).toBeVisible();
+});
+
+
+test("Learning Academy remains usable at a narrow mobile viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/academy");
+  await expect(page.getByRole("heading", { name: "Learning Academy" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Responsible Defence Technology Literacy/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Test your understanding" })).toBeVisible();
+  const dimensions = await page.evaluate(() => ({
+    viewport: document.documentElement.clientWidth,
+    content: document.documentElement.scrollWidth
+  }));
+  expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport);
+});
+
+test("Learning Academy remains readable when browser local storage is unavailable", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      get() { throw new DOMException("Storage is blocked", "SecurityError"); }
+    });
+  });
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+  await page.goto("/academy");
+  await expect(page.getByRole("heading", { name: "Learning Academy" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Test your understanding" })).toBeVisible();
+  expect(pageErrors).toEqual([]);
+});
