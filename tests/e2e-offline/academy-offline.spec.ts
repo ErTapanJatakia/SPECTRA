@@ -16,8 +16,8 @@ test("Learning Academy reloads and remains usable offline after its first online
     return (await cache.keys()).map((request) => new URL(request.url).pathname);
   });
   expect(cachedResources).toContain("/index.html");
-  expect(cachedResources.some((path) => /\\.js$/.test(path))).toBe(true);
-  expect(cachedResources.some((path) => /\\.css$/.test(path))).toBe(true);
+  expect(cachedResources.some((path) => /\.js$/.test(path))).toBe(true);
+  expect(cachedResources.some((path) => /\.css$/.test(path))).toBe(true);
 
   await context.setOffline(true);
   await page.reload();
