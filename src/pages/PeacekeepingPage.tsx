@@ -83,7 +83,7 @@ const resources = [
     title: "Conduct training",
     publisher: "United Nations Conduct and Discipline Service",
     scope: "Induction, pre-deployment and specialised conduct and discipline training.",
-    url: "https://www.unmissions.org/en/conduct-and-discipline-service/conduct-training"
+    url: "https://conduct.unmissions.org/en/node/50631"
   },
   {
     title: "Standards of conduct",
