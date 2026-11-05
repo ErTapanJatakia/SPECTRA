@@ -20,6 +20,7 @@ Prompt 05 is in progress. This document describes the first vertical slice and t
 - Progress is stored in the browser under `spectra.learning-progress.v1`.
 - Storage is versioned and parsed defensively; malformed or unsupported state falls back to an empty progress record.
 - No account, backend, network request, analytics, telemetry or cross-device sync is introduced.
+- Browser local storage is not encrypted; anyone with access to the same browser profile may be able to inspect or clear the progress record. Do not store sensitive personal information in this feature.
 - Learners can reset local progress.
 - Browser storage may be cleared by the user, browser policy or private-session lifecycle; persistence is best-effort.
 
