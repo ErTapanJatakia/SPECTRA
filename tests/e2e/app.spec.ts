@@ -541,3 +541,28 @@ test("Learning Academy remains readable when browser local storage is unavailabl
   await expect(page.getByRole("heading", { name: "Test your understanding" })).toBeVisible();
   expect(pageErrors).toEqual([]);
 });
+
+
+test("Peacekeeping hub presents the six-area curriculum and authoritative UN resources", async ({ page }) => {
+  await page.goto("/peacekeeping");
+  await expect(page.getByRole("heading", { name: "Peacekeeping Education" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Six learning areas" })).toBeVisible();
+  await expect(page.locator(".peacekeeping-area-card")).toHaveCount(6);
+  await expect(page.getByRole("heading", { name: "Official resources and further reading" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Core Pre-Deployment Training Materials (CPTM)" })).toHaveAttribute("href", "https://peacekeepingresourcehub.un.org/en/training/pre-deployment/cptm/intro");
+  await expect(page.getByRole("link", { name: "Open resource: Protection of civilians mandate" })).toHaveAttribute("rel", "noreferrer");
+  await expect(page.getByRole("link", { name: "Continue to Learning Academy" })).toHaveAttribute("href", "/academy");
+  await expect(page.getByText(/not affiliated with, endorsed by, certified by or operated by the United Nations/)).toBeVisible();
+});
+
+test("Peacekeeping hub remains usable at a narrow mobile viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/peacekeeping");
+  await expect(page.getByRole("heading", { name: "Peacekeeping Education" })).toBeVisible();
+  await expect(page.locator(".peacekeeping-area-card")).toHaveCount(6);
+  const dimensions = await page.evaluate(() => ({
+    viewport: document.documentElement.clientWidth,
+    content: document.documentElement.scrollWidth
+  }));
+  expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport);
+});
