@@ -8,7 +8,7 @@ import { Center, OrbitControls, useGLTF } from "@react-three/drei";
 import PageHeading from "../components/PageHeading";
 import Icon from "../components/Icon";
 import { inspectModelHierarchy, type ModelNodeSnapshot } from "../lib/modelInspection";
-import { cameraPositionForPreset, distanceBetweenPoints, formatDistance, type CameraPreset } from "../lib/spatialAnalysis";
+import { cameraDistanceForBounds, cameraPositionForPreset, distanceBetweenPoints, formatDistance, type CameraPreset } from "../lib/spatialAnalysis";
 import "./studio3d.css";
 
 const MAX_MODEL_BYTES = 25 * 1024 * 1024;
@@ -375,7 +375,7 @@ function ImportedModel({ url, selectedNodeId, onHierarchyChange }: {
 }
 
 type PerformanceSample = { fps: number; geometries: number; textures: number; drawCalls: number };
-type ViewCommand = { id: number; preset: CameraPreset | "fit"; target: [number, number, number] };
+type ViewCommand = { id: number; preset: CameraPreset | "fit"; target: [number, number, number]; distance?: number };
 
 function ViewportCameraController({ command, controlsRef }: {
   command: ViewCommand | null;
@@ -386,7 +386,7 @@ function ViewportCameraController({ command, controlsRef }: {
     if (!command || !controlsRef.current) return;
     const target = new THREE.Vector3(...command.target);
     const position = command.preset === "fit"
-      ? [target.x + 4.2, target.y + 3.1, target.z + 5.2] as [number, number, number]
+      ? cameraPositionForPreset(command.target, "isometric", command.distance ?? 7)
       : cameraPositionForPreset(command.target, command.preset, 7);
     camera.position.set(...position);
     camera.up.set(0, 1, 0);
@@ -466,7 +466,7 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
         </ModelErrorBoundary>
       </Suspense>
       <PerformanceSampler onSample={onPerformanceSample} />
-      <OrbitControls ref={controlsRef} key={resetKey} makeDefault enableDamping={!reducedMotion} dampingFactor={reducedMotion ? 0 : 0.08} minDistance={2} maxDistance={18} />
+      <OrbitControls ref={controlsRef} key={resetKey} makeDefault enableDamping={!reducedMotion} dampingFactor={reducedMotion ? 0 : 0.08} minDistance={2} maxDistance={10_000} />
       <ViewportCameraController command={cameraCommand} controlsRef={controlsRef} />
     </Canvas>
     {contextLost && <div className="studio-canvas-error" role="alert">The WebGL context was lost. The viewer will resume if the browser restores graphics access; otherwise reload the page or use the text-based model notes.</div>}
@@ -526,7 +526,34 @@ export default function Studio3DPage() {
   const selectedModelNode = modelNodes.find((node) => node.id === selectedNodeId);
   const measurementStartNode = modelNodes.find((node) => node.id === measurementStartId);
   const requestCameraView = (preset: CameraPreset | "fit", target: [number, number, number] = [0, 0, 0]) => {
-    setCameraCommand({ id: ++cameraCommandSequence.current, preset, target });
+    let resolvedTarget = target;
+    let distance = 7;
+    if (preset === "fit") {
+      const meshNodes = modelNodes.filter((node) => node.isMesh && node.boundsCenter && node.boundsSize);
+      if (meshNodes.length > 0) {
+        const minimum: [number, number, number] = [Infinity, Infinity, Infinity];
+        const maximum: [number, number, number] = [-Infinity, -Infinity, -Infinity];
+        for (const node of meshNodes) {
+          const center = node.boundsCenter!;
+          const size = node.boundsSize!;
+          for (let axis = 0; axis < 3; axis += 1) {
+            minimum[axis] = Math.min(minimum[axis], center[axis] - size[axis] / 2);
+            maximum[axis] = Math.max(maximum[axis], center[axis] + size[axis] / 2);
+          }
+        }
+        resolvedTarget = [
+          (minimum[0] + maximum[0]) / 2,
+          (minimum[1] + maximum[1]) / 2,
+          (minimum[2] + maximum[2]) / 2
+        ];
+        distance = cameraDistanceForBounds([
+          maximum[0] - minimum[0],
+          maximum[1] - minimum[1],
+          maximum[2] - minimum[2]
+        ]);
+      }
+    }
+    setCameraCommand({ id: ++cameraCommandSequence.current, preset, target: resolvedTarget, distance });
   };
 
   const handlePerformanceSample = useCallback((sample: PerformanceSample) => {
@@ -623,7 +650,7 @@ export default function Studio3DPage() {
               selectedNodeId={selectedNodeId} onHierarchyChange={handleHierarchyChange} cameraCommand={cameraCommand} />
             {showAnnotations && !modelUrl && <div className="studio-hotspot-controls" role="group" aria-label="Scene annotation hotspots">
               {annotations.map((item) => <button key={item.id} className={`studio-hotspot ${selectedAnnotation === item.id ? "studio-hotspot-active" : ""}`}
-                onClick={() => setSelectedAnnotation(item.id)} aria-label={`Show annotation: ${item.title}`}>{item.id}</button>)}
+                onClick={() => setSelectedAnnotation(item.id)} aria-label={`Select scene annotation hotspot ${item.id}`}>{item.id}</button>)}
             </div>}
             <div className="studio-viewer-hint"><span>DRAG · ORBIT</span><span>SCROLL · ZOOM</span><span>RIGHT-DRAG · PAN</span></div>
           </div>
