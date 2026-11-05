@@ -490,3 +490,17 @@ test("Peacekeeping lesson displays official, scoped source references", async ({
   await expect(page.getByRole("link", { name:"Mandates and the legal basis for peacekeeping" })).toBeVisible();
   await expect(page.getByRole("link", { name:"Standards of conduct" })).toBeVisible();
 });
+
+
+test("Learning Academy lesson navigation exposes selection state and keyboard focus", async ({ page }) => {
+  await page.goto("/academy");
+  const activeLesson = page.getByRole("button", { name:/Technology literacy and responsible scope/ });
+  await expect(activeLesson).toHaveAttribute("aria-pressed", "true");
+  const nextLesson = page.getByRole("button", { name:/Source provenance and confidence/ });
+  await nextLesson.focus();
+  await expect(nextLesson).toBeFocused();
+  await expect(nextLesson).toHaveCSS("outline-style", "solid");
+  await nextLesson.click();
+  await expect(nextLesson).toHaveAttribute("aria-pressed", "true");
+  await expect(activeLesson).toHaveAttribute("aria-pressed", "false");
+});
