@@ -18,7 +18,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "check:all": "npm run validate:content && npm run typecheck && npm run lint && npm run test && npm run build"
+    "check:all": "npm run validate:content && npm run typecheck && npm run lint && npm run test && npm run build",
+    "test:e2e:offline": "playwright test --config=playwright.offline.config.ts"
   },
   "dependencies": {
     "react": "19.3.0",
