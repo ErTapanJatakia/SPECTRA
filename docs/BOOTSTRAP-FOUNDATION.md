@@ -20,7 +20,7 @@ Prompt 03 adds the canonical content model, typed Zod schemas, an initial curate
 - Side-by-side comparison of up to three records.
 - Zod schema validation and cross-reference checks for content records.
 - Static application manifest and same-origin service worker.
-- Unit and browser test suites.
+- Unit and browser test suites.\n- Initial Learning Academy pathways, lessons, knowledge checks and browser-local progress (Prompt 05 foundation).
 - GitHub Actions quality and lockfile workflows.
 
 ## Explicitly not implemented

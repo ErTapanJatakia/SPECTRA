@@ -194,14 +194,14 @@ The repository includes original concept illustrations prepared for SPECTRA:
 | 01 | Architecture and product blueprint | Completed |
 | 02 | Repository foundation and design system | Implemented; CI passed |
 | 03 | Military systems knowledge base | Implemented; five-country, eleven-record sample and validator committed |
-| 04 | Interactive 3D Studio | Not started |
-| 05 | Learning Academy | Not started |
+| 04 | Interactive 3D Studio | Implemented; local model validation, inspection and educational annotations; spatial navigation deferred in PR #8 |
+| 05 | Learning Academy | In progress; initial local-first pathways, lessons and assessments in PR #9 |
 | 06 | Peacekeeping education | Not started |
 | 07 | Editorial and research framework | Not started |
 | 08 | Advanced features and offline learning | Not started |
 | 09 | Security, quality assurance, and release readiness | Not started |
 
-The project will proceed through individually reviewed and approved development stages. No milestone should be treated as complete until its acceptance criteria have been met and the relevant work is committed.
+Prompt 05 begins with three introductory pathways, structured lessons, formative knowledge checks and browser-local learner progress. The initial implementation is a foundation release, not a complete curriculum or professional qualification. See [Learning Academy Foundation](docs/learning-academy/LEARNING-ACADEMY-FOUNDATION.md).\n\nThe project will proceed through individually reviewed and approved development stages. No milestone should be treated as complete until its acceptance criteria have been met and the relevant work is committed.
 
 ## Security and accessibility principles
 
