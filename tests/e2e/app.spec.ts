@@ -504,3 +504,10 @@ test("Learning Academy lesson navigation exposes selection state and keyboard fo
   await expect(nextLesson).toHaveAttribute("aria-pressed", "true");
   await expect(activeLesson).toHaveAttribute("aria-pressed", "false");
 });
+
+
+test("Learning Academy explains the limits of browser-local progress privacy", async ({ page }) => {
+  await page.goto("/academy");
+  await expect(page.getByText(/Local storage is not encrypted/)).toBeVisible();
+  await expect(page.getByText(/not sent to a SPECTRA server/)).toBeVisible();
+});
