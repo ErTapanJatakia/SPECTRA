@@ -41,7 +41,7 @@ Prompt 05 is in progress. This document describes the first vertical slice and t
 ## Deferred work
 - Larger, reviewed curriculum and lesson authoring workflow.
 - Additional assessment formats and question-bank governance.
-- Content references attached at lesson and claim level.
+- Content references attached at lesson and claim level. The peacekeeping principles lesson links to official UN Peacekeeping material for principles, mandate context and standards of conduct; source scope and access date are recorded in lesson metadata.
 - Offline cache verification for lesson assets and future course packages.
 - Learner export/import with explicit user control, if justified.
 - Further accessibility review with automated and manual checks.
