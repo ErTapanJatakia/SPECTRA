@@ -201,7 +201,9 @@ The repository includes original concept illustrations prepared for SPECTRA:
 | 08 | Advanced features and offline learning | Not started |
 | 09 | Security, quality assurance, and release readiness | Not started |
 
-Prompt 05 begins with three introductory pathways, structured lessons, formative knowledge checks and browser-local learner progress. The initial implementation is a foundation release, not a complete curriculum or professional qualification. See [Learning Academy Foundation](docs/learning-academy/LEARNING-ACADEMY-FOUNDATION.md).\n\nThe project will proceed through individually reviewed and approved development stages. No milestone should be treated as complete until its acceptance criteria have been met and the relevant work is committed.
+Prompt 05 begins with three introductory pathways, structured lessons, formative knowledge checks and browser-local learner progress. The initial implementation is a foundation release, not a complete curriculum or professional qualification. See [Learning Academy Foundation](docs/learning-academy/LEARNING-ACADEMY-FOUNDATION.md).
+
+The project will proceed through individually reviewed and approved development stages. No milestone should be treated as complete until its acceptance criteria have been met and the relevant work is committed.
 
 ## Security and accessibility principles
 
