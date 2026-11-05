@@ -74,3 +74,11 @@
 .academy-governance .text-button{flex:0 0 auto}
 @media(max-width:1000px){.academy-pathway-grid{grid-template-columns:1fr 1fr}.academy-workspace{grid-template-columns:1fr}.academy-lesson-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}.academy-nav-heading,.academy-outcomes{grid-column:1/-1}.academy-lesson-link{border-top:1px solid var(--border)}}
 @media(max-width:620px){.academy-pathway-grid{grid-template-columns:1fr}.academy-section-heading{align-items:flex-start;flex-direction:column}.academy-lesson-nav{display:flex;flex-direction:column}.academy-intro{align-items:flex-start;padding:14px}.academy-intro-mark{width:40px;height:40px;flex-basis:40px}.academy-lesson{padding:14px}.academy-lesson-header{flex-direction:column}.academy-result{align-items:flex-start;flex-direction:column}.academy-governance{flex-wrap:wrap}.academy-governance .text-button{margin-left:29px}}
+
+
+.academy-references{margin:18px 0;padding:15px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2)}
+.academy-references h3{margin:0 0 10px;font-size:12px}
+.academy-references ul{display:grid;gap:10px;margin:0;padding-left:18px}
+.academy-references li{padding-left:2px;color:var(--muted);font-size:10px;line-height:1.6}
+.academy-references a{color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.academy-references li span{display:block;color:var(--muted);font-size:9px}
