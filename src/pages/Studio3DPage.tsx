@@ -621,6 +621,10 @@ export default function Studio3DPage() {
             <Scene modelUrl={modelUrl} showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation}
               onSelect={setSelectedAnnotation} resetKey={resetKey} dark={dark} dpr={renderDpr} reducedMotion={reducedMotion} onPerformanceSample={handlePerformanceSample}
               selectedNodeId={selectedNodeId} onHierarchyChange={handleHierarchyChange} cameraCommand={cameraCommand} />
+            {showAnnotations && !modelUrl && <div className="studio-hotspot-controls" role="group" aria-label="Scene annotation hotspots">
+              {annotations.map((item) => <button key={item.id} className={`studio-hotspot ${selectedAnnotation === item.id ? "studio-hotspot-active" : ""}`}
+                onClick={() => setSelectedAnnotation(item.id)} aria-label={`Show annotation: ${item.title}`}>{item.id}</button>)}
+            </div>}
             <div className="studio-viewer-hint"><span>DRAG · ORBIT</span><span>SCROLL · ZOOM</span><span>RIGHT-DRAG · PAN</span></div>
           </div>
           <div className="studio-viewer-caption"><span><i className="studio-status-dot" /> Browser-local rendering</span><span>No model is uploaded to SPECTRA servers</span></div>
