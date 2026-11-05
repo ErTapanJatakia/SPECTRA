@@ -54,8 +54,8 @@ test("3D Studio camera presets, world-space inspection and point distance measur
     scenes: [{ nodes: [0] }],
     nodes: [
       { name: "Assembly", translation: [2, 0, 0], children: [1, 2] },
-      { name: "Reference A", translation: [1, 2, 3], mesh: 0 },
-      { name: "Reference B", translation: [5, 2, 3], mesh: 0 }
+      { name: "Reference_A", translation: [1, 2, 3], mesh: 0 },
+      { name: "Reference_B", translation: [5, 2, 3], mesh: 0 }
     ],
     meshes: [{ primitives: [{ attributes: { POSITION: 0 } }] }],
     accessors: [{
@@ -97,16 +97,16 @@ test("3D Studio camera presets, world-space inspection and point distance measur
     hierarchy: await page.locator(".studio-node-tree").innerText().catch(() => "<missing tree>"),
     importError: await page.locator(".studio-error").allInnerTexts(),
     pageText: (await page.locator("body").innerText()).slice(-1800)
-  }), { timeout: 5000 }).toContain("Reference A");
-  await expect(page.getByRole("button", { name: /Reference A/ })).toBeVisible();
+  }), { timeout: 5000 }).toContain("Reference_A");
+  await expect(page.getByRole("button", { name: /Reference_A/ })).toBeVisible();
   await expect(page.getByRole("button", { name: "Front view" })).toBeVisible();
   await page.getByRole("button", { name: "Top view" }).click();
   await page.getByRole("button", { name: "Isometric view" }).click();
-  await page.getByRole("button", { name: /Reference A/ }).click();
+  await page.getByRole("button", { name: /Reference_A/ }).click();
   await expect(page.getByText(/World position: 3\\.000, 2\\.000, 3\\.000/)).toBeVisible();
   await page.getByRole("button", { name: "Set measurement start" }).click();
-  await page.getByRole("button", { name: /Reference B/ }).click();
-  await expect(page.getByText(/Distance from Reference A: 4\\.000 m/)).toBeVisible();
+  await page.getByRole("button", { name: /Reference_B/ }).click();
+  await expect(page.getByText(/Distance from Reference_A: 4\\.000 m/)).toBeVisible();
   await page.getByRole("button", { name: "Focus selected" }).click();
   await page.getByRole("button", { name: "Reset 3D viewport camera" }).click();
 });
