@@ -10,8 +10,7 @@ test("Learning Academy reloads and remains usable offline after its first online
   });
   await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
 
-  // The first document load can finish before the newly registered worker controls
-  // the page. Reload once while online so the worker can cache the app's JS and CSS.
+  // Reload under service-worker control so application assets are fetched and cached.
   await page.reload();
   await expect(page.getByRole("heading", { name: "Learning Academy" })).toBeVisible();
 
@@ -22,9 +21,10 @@ test("Learning Academy reloads and remains usable offline after its first online
     const cache = await caches.open(shellKey);
     return (await cache.keys()).map((request) => new URL(request.url).pathname);
   });
+
   expect(cachedResources).toContain("/index.html");
-  expect(cachedResources.some((path) => /\\.js$/i.test(path))).toBe(true);
-  expect(cachedResources.some((path) => /\\.css$/i.test(path))).toBe(true);
+  expect(cachedResources.some((path) => path.toLowerCase().endsWith(".js"))).toBe(true);
+  expect(cachedResources.some((path) => path.toLowerCase().endsWith(".css"))).toBe(true);
 
   await context.setOffline(true);
   await page.reload();
