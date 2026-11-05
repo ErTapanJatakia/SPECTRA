@@ -85,6 +85,6 @@
 
 
 /* Visible keyboard focus and legible minimum text sizing for Academy controls. */
-.academy-page :is(button,a,input):focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
+.academy-page :is(button,a,input):focus{outline:3px solid var(--accent);outline-offset:3px;}
 .academy-page .academy-option:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft);}
 .academy-page button:disabled:focus-visible{outline-color:var(--muted);}
