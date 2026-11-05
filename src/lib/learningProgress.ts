@@ -19,15 +19,20 @@ export function parseLearningProgress(raw: string | null): LearningProgress {
     }
     const lessons: Record<string, LessonProgress> = {};
     for (const [id, value] of Object.entries(candidate.lessons)) {
-      if (!value || typeof value !== "object") continue;
+      if (!id.trim() || !value || typeof value !== "object" || Array.isArray(value)) continue;
       const item = value as Record<string, unknown>;
       if (typeof item.completed !== "boolean" || typeof item.bestScore !== "number" || !Number.isFinite(item.bestScore) ||
-          typeof item.attempts !== "number" || !Number.isInteger(item.attempts) || item.attempts < 0) continue;
-      lessons[id] = {
-        completed: item.completed,
-        bestScore: Math.max(0, Math.min(100, Math.round(item.bestScore))),
-        attempts: item.attempts
-      };
+          typeof item.attempts !== "number" || !Number.isInteger(item.attempts) || item.attempts < 1) continue;
+
+      const bestScore = Math.max(0, Math.min(100, Math.round(item.bestScore)));
+      if (item.completed !== (bestScore >= 70)) continue;
+
+      Object.defineProperty(lessons, id, {
+        value: { completed: item.completed, bestScore, attempts: item.attempts },
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
     }
     return { version: 1, lessons };
   } catch {
