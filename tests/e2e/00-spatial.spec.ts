@@ -43,7 +43,23 @@ test("3D Studio camera presets, world-space inspection and point distance measur
   await expect(page.getByRole("heading", { name: "Scene hierarchy" })).toBeVisible();
   // Capture renderer failures explicitly rather than mistaking an unpopulated hierarchy
   // for a slow GLTF load.
-  await expect(page.locator(".studio-canvas-error")).toHaveCount(0);
+  const canvasError = page.locator(".studio-canvas-error");
+  if (await canvasError.count()) {
+    const fallbackText = await canvasError.first().innerText();
+    const canvasState = await page.locator("canvas").first().evaluate((canvas) => {
+      const element = canvas as HTMLCanvasElement;
+      const gl = element.getContext("webgl2") ?? element.getContext("webgl");
+      return {
+        canvasPresent: true,
+        width: element.width,
+        height: element.height,
+        webglContextAvailable: Boolean(gl),
+        contextLost: gl?.isContextLost() ?? null
+      };
+    }).catch((error: unknown) => ({ diagnosticError: error instanceof Error ? error.message : String(error) }));
+    console.log("[spatial canvas diagnostic]", JSON.stringify({ fallbackText, canvasState }));
+  }
+  await expect(canvasError).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Reference A/ })).toBeVisible();
   await expect(page.getByRole("button", { name: "Front view" })).toBeVisible();
   await page.getByRole("button", { name: "Top view" }).click();
