@@ -54,7 +54,7 @@ export default function AcademyPage() {
 
   return (
     <div className="page-stack academy-page">
-      <PageHeading eyebrow="STRUCTURED EDUCATION" title="Learning Academy" description="Self-paced, source-aware learning pathways with short knowledge checks and private, browser-local progress." actions={<span className="academy-local-tag"><Icon name="lock" size={13} /> LOCAL PROGRESS</span>} />
+      <PageHeading eyebrow="STRUCTURED EDUCATION" title="Learning Academy" description="Self-paced, source-aware learning pathways with short knowledge checks and device-local progress." actions={<span className="academy-local-tag"><Icon name="lock" size={13} /> LOCAL PROGRESS</span>} />
       <section className="academy-intro">
         <div className="academy-intro-mark"><Icon name="graduation" size={27} /></div>
         <div><span className="eyebrow">FOUNDATION LEARNING RELEASE</span><h2>Learn the context. Check your understanding.</h2><p>Explore introductory material, complete a short assessment and track your own progress on this device. Passing a quiz is a learning milestone—not a professional qualification or certification.</p></div>
@@ -110,7 +110,7 @@ export default function AcademyPage() {
         </article>
       </section>
 
-      <section className="academy-governance"><Icon name="shield" size={19} /><div><strong>Educational scope and privacy</strong><p>Content is introductory and non-operational. Progress is stored only in this browser's local storage; it is not sent to a SPECTRA server. Clearing browser data or using another device may remove or reset progress. Do not use this module as a substitute for official UN, national or employer-authorised training.</p></div><button type="button" className="text-button" onClick={resetProgress}>Reset local progress</button></section>
+      <section className="academy-governance"><Icon name="shield" size={19} /><div><strong>Educational scope and privacy</strong><p>Content is introductory and non-operational. Progress is stored in this browser's local storage and is not sent to a SPECTRA server. Local storage is not encrypted and may be visible to anyone with access to this browser profile. Clearing browser data or using another device may remove or reset progress. Do not use this module as a substitute for official UN, national or employer-authorised training.</p></div><button type="button" className="text-button" onClick={resetProgress}>Reset local progress</button></section>
     </div>
   );
 }
