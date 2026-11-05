@@ -10,6 +10,7 @@ import SearchPage from "./pages/SearchPage";
 import PlaceholderPage from "./pages/PlaceholderPage";
 import Studio3DPage from "./pages/Studio3DPage";
 import AcademyPage from "./pages/AcademyPage";
+import PeacekeepingPage from "./pages/PeacekeepingPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 export default function App() {
@@ -26,7 +27,7 @@ export default function App() {
           <Route path="search" element={<SearchPage />} />
           <Route path="studio-3d" element={<Studio3DPage />} />
           <Route path="academy" element={<AcademyPage />} />
-          <Route path="peacekeeping" element={<PlaceholderPage page="peacekeeping" />} />
+          <Route path="peacekeeping" element={<PeacekeepingPage />} />
           <Route path="research" element={<PlaceholderPage page="research" />} />
           <Route path="settings" element={<PlaceholderPage page="settings" />} />
         </Route>
