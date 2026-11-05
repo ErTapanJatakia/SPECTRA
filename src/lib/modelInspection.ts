@@ -9,6 +9,7 @@ export type ModelNodeSnapshot = {
   position: [number, number, number];
   worldPosition: [number, number, number];
   boundsSize?: [number, number, number];
+  boundsCenter?: [number, number, number];
   rotation: [number, number, number];
   scale: [number, number, number];
   isMesh: boolean;
@@ -48,7 +49,9 @@ export function inspectModelHierarchy(root: THREE.Object3D, maxNodes = 2500): Mo
       : undefined;
     const position = finiteTuple(object.position.toArray().slice(0, 3));
     const worldPosition = finiteTuple(object.getWorldPosition(new THREE.Vector3()).toArray());
-    const boundsSize = isMesh ? finiteTuple(new THREE.Box3().setFromObject(object).getSize(new THREE.Vector3()).toArray()) : undefined;
+    const bounds = isMesh ? new THREE.Box3().setFromObject(object) : undefined;
+    const boundsSize = bounds ? finiteTuple(bounds.getSize(new THREE.Vector3()).toArray()) : undefined;
+    const boundsCenter = bounds ? finiteTuple(bounds.getCenter(new THREE.Vector3()).toArray()) : undefined;
     const rotation = finiteTuple([object.rotation.x, object.rotation.y, object.rotation.z]);
     const scale = finiteTuple(object.scale.toArray().slice(0, 3));
 
@@ -60,7 +63,7 @@ export function inspectModelHierarchy(root: THREE.Object3D, maxNodes = 2500): Mo
       visible: object.visible,
       position,
       worldPosition,
-      ...(isMesh ? { boundsSize } : {}),
+      ...(isMesh ? { boundsSize, boundsCenter } : {}),
       rotation,
       scale,
       isMesh,
