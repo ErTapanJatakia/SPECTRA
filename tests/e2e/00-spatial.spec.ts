@@ -76,11 +76,17 @@ test("3D Studio camera presets, world-space inspection and point distance measur
   });
   await expect(page.getByText("LOCAL MODEL", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Scene hierarchy" })).toBeVisible();
-  const canvasError = page.locator(".studio-canvas-error");
-  if (await canvasError.count()) {
-    console.log("[spatial canvas fallback]", await canvasError.first().innerText());
-  }
-  await expect(canvasError).toHaveCount(0);
+  // React Three Fiber places its fallback node inside the <canvas> element.
+  // It remains in the DOM as native canvas fallback content even when WebGL works,
+  // so asserting that the node is absent would incorrectly fail healthy renderers.
+  await expect(page.locator("canvas").first()).toHaveAttribute("role", "application");
+  expect(rendererDiagnostics).toMatchObject({
+    canvas: {
+      onCreatedMarker: "application",
+      context: { available: true, contextLost: false }
+    }
+  });
+  expect(rendererDiagnostics.canvas.context.version).toContain("WebGL 2.0");
   await expect(page.getByRole("button", { name: /Reference A/ })).toBeVisible();
   await expect(page.getByRole("button", { name: "Front view" })).toBeVisible();
   await page.getByRole("button", { name: "Top view" }).click();
