@@ -4,7 +4,7 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
-import { Center, OrbitControls, useGLTF } from "@react-three/drei";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 import PageHeading from "../components/PageHeading";
 import Icon from "../components/Icon";
 import { inspectModelHierarchy, type ModelNodeSnapshot } from "../lib/modelInspection";
@@ -462,7 +462,7 @@ function Scene({ modelUrl, showAnnotations, selectedAnnotation, onSelect, resetK
       <gridHelper args={[12, 24, dark ? "#334b56" : "#c1d0d4", dark ? "#263943" : "#d2dcdf"]} position={[0, -0.8, 0]} />
       <Suspense fallback={null}>
         <ModelErrorBoundary>
-          {modelUrl ? <Center><ImportedModel url={modelUrl} selectedNodeId={selectedNodeId} onHierarchyChange={onHierarchyChange} /></Center> : <DemoModel showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation} onSelect={onSelect} />}
+          {modelUrl ? <ImportedModel url={modelUrl} selectedNodeId={selectedNodeId} onHierarchyChange={onHierarchyChange} /> : <DemoModel showAnnotations={showAnnotations} selectedAnnotation={selectedAnnotation} onSelect={onSelect} />}
         </ModelErrorBoundary>
       </Suspense>
       <PerformanceSampler onSample={onPerformanceSample} />
