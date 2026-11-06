@@ -118,6 +118,14 @@ img, svg { max-width: 100%; }
   overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
 }
 
+.skip-link {
+  position: fixed; top: 8px; left: 8px; z-index: 100;
+  padding: 10px 14px; color: var(--text); background: var(--surface);
+  border: 2px solid var(--focus); border-radius: 8px; font-size: 12px; font-weight: 750;
+  box-shadow: var(--shadow-soft); transform: translateY(-160%);
+}
+.skip-link:focus-visible { transform: translateY(0); }
+
 #root { min-height: 100vh; }
 .app-frame {
   display: grid;
