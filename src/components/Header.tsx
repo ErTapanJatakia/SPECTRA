@@ -1,10 +1,14 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { FormEvent, RefObject } from "react";
 import { useLocation, useNavigate } from "react-router";
 import Icon from "./Icon";
 import ThemeSwitcher from "./ThemeSwitcher";
 
-interface HeaderProps { onMenuToggle: () => void; }
+interface HeaderProps {
+  onMenuToggle: () => void;
+  menuOpen: boolean;
+  menuButtonRef: RefObject<HTMLButtonElement | null>;
+}
 
 function getPageLabel(pathname: string): string {
   if (pathname === "/") return "Overview";
@@ -21,10 +25,11 @@ function getPageLabel(pathname: string): string {
   return labels[segment] ?? "Workspace";
 }
 
-export default function Header({ onMenuToggle }: HeaderProps) {
+export default function Header({ onMenuToggle, menuOpen, menuButtonRef }: HeaderProps) {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const pageLabel = getPageLabel(location.pathname);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,8 +39,19 @@ export default function Header({ onMenuToggle }: HeaderProps) {
 
   return (
     <header className="topbar">
-      <button className="icon-button mobile-menu-button" type="button" onClick={onMenuToggle} aria-label="Open navigation"><Icon name="menu" /></button>
-      <div className="breadcrumb"><span className="breadcrumb-root">SPECTRA</span><Icon name="chevron" size={14} /><span>{getPageLabel(location.pathname)}</span></div>
+      <button
+        ref={menuButtonRef}
+        className="icon-button mobile-menu-button"
+        type="button"
+        onClick={onMenuToggle}
+        aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+        aria-expanded={menuOpen}
+        aria-controls="main-navigation"
+      ><Icon name="menu" /></button>
+      <div className="breadcrumb" aria-label="Current page">
+        <span className="breadcrumb-root">SPECTRA</span><Icon name="chevron" size={14} /><span>{pageLabel}</span>
+      </div>
+      <span className="sr-only" aria-live="polite" aria-atomic="true">{pageLabel} page loaded</span>
       <form className="global-search" role="search" onSubmit={handleSubmit}>
         <Icon name="search" size={17} />
         <input type="search" aria-label="Search SPECTRA divisions and equipment" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search countries, systems, equipment..." />

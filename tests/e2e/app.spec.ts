@@ -53,10 +53,48 @@ test("global search finds equipment as well as divisions", async ({ page }) => {
   await expect(page.getByRole("heading", { name:"Mogami-Class Multi-Mission Frigate" })).toBeVisible();
 });
 
-test("theme preference can be changed", async ({ page }) => {
+test("theme preference can be changed across all available modes", async ({ page }) => {
   await page.goto("/");
-  await page.getByLabel("Visual theme").selectOption("contrast");
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "contrast");
+  const theme = page.getByLabel("Visual theme");
+  for (const mode of ["light", "dark", "contrast", "system"]) {
+    await theme.selectOption(mode);
+    if (mode === "system") {
+      await expect(page.locator("html")).toHaveAttribute("data-theme", /^(light|dark)$/);
+    } else {
+      await expect(page.locator("html")).toHaveAttribute("data-theme", mode);
+    }
+  }
+});
+
+test("theme subtle-text tokens meet WCAG AA contrast against shared surfaces", async ({ page }) => {
+  await page.goto("/");
+  const theme = page.getByLabel("Visual theme");
+  for (const mode of ["light", "dark", "contrast"]) {
+    await theme.selectOption(mode);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", mode);
+    const ratios = await page.evaluate(() => {
+      const style = getComputedStyle(document.documentElement);
+      const subtle = style.getPropertyValue("--subtle").trim();
+      const backgrounds = ["--page", "--page-glow", "--surface", "--surface-2", "--surface-3", "--accent-soft"]
+        .map((token) => style.getPropertyValue(token).trim());
+      const rgb = (hex: string) => {
+        const value = hex.replace("#", "");
+        return [0, 2, 4].map((offset) => parseInt(value.slice(offset, offset + 2), 16) / 255);
+      };
+      const luminance = (hex: string) => {
+        const channels = rgb(hex).map((value) => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+        return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+      };
+      const foreground = luminance(subtle);
+      return backgrounds.map((background) => {
+        const surface = luminance(background);
+        const lighter = Math.max(foreground, surface);
+        const darker = Math.min(foreground, surface);
+        return (lighter + 0.05) / (darker + 0.05);
+      });
+    });
+    expect(Math.min(...ratios), `subtle text contrast in ${mode} theme`).toBeGreaterThanOrEqual(4.5);
+  }
 });
 
 test("3D Studio opens with the educational demonstration model", async ({ page }) => {
@@ -540,4 +578,29 @@ test("Learning Academy remains readable when browser local storage is unavailabl
   await expect(page.getByRole("heading", { name: "Learning Academy" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Test your understanding" })).toBeVisible();
   expect(pageErrors).toEqual([]);
+});
+
+
+test("Peacekeeping hub presents the six-area curriculum and authoritative UN resources", async ({ page }) => {
+  await page.goto("/peacekeeping");
+  await expect(page.getByRole("heading", { name: "Peacekeeping Education" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Six learning areas" })).toBeVisible();
+  await expect(page.locator(".peacekeeping-area-card")).toHaveCount(6);
+  await expect(page.getByRole("heading", { name: "Official resources and further reading" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Core Pre-Deployment Training Materials (CPTM)", exact: true })).toHaveAttribute("href", "https://peacekeepingresourcehub.un.org/en/training/pre-deployment/cptm/intro");
+  await expect(page.getByRole("link", { name: "Open resource: Protection of civilians mandate" })).toHaveAttribute("rel", "noreferrer");
+  await expect(page.getByRole("link", { name: "Continue to Learning Academy" })).toHaveAttribute("href", "/academy");
+  await expect(page.getByText(/not affiliated with, endorsed by, certified by or operated by the United Nations/)).toBeVisible();
+});
+
+test("Peacekeeping hub remains usable at a narrow mobile viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/peacekeeping");
+  await expect(page.getByRole("heading", { name: "Peacekeeping Education" })).toBeVisible();
+  await expect(page.locator(".peacekeeping-area-card")).toHaveCount(6);
+  const dimensions = await page.evaluate(() => ({
+    viewport: document.documentElement.clientWidth,
+    content: document.documentElement.scrollWidth
+  }));
+  expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport);
 });
