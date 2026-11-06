@@ -11,6 +11,7 @@ export default function AppShell() {
 
   return (
     <div className="app-frame">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       <Sidebar open={menuOpen} onNavigate={() => setMenuOpen(false)} />
       {menuOpen && <button className="mobile-scrim" aria-label="Close navigation" onClick={() => setMenuOpen(false)} />}
       <div className="main-column">
