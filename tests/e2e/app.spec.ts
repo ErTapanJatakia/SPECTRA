@@ -604,3 +604,24 @@ test("Peacekeeping hub remains usable at a narrow mobile viewport", async ({ pag
   }));
   expect(dimensions.content).toBeLessThanOrEqual(dimensions.viewport);
 });
+
+
+test("homepage visual review captures desktop and mobile layouts", async ({ page, browserName }, testInfo) => {
+  for (const width of [1440, 1280, 390]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name:/GLOBAL DEFENCE SYSTEMS/i })).toBeVisible();
+    await expect(page.locator(".welcome-banner")).toBeVisible();
+    await expect(page.locator(".domain-card")).toHaveCount(10);
+    const dimensions = await page.evaluate(() => ({
+      viewport: document.documentElement.clientWidth,
+      content: document.documentElement.scrollWidth
+    }));
+    expect(dimensions.content, `horizontal overflow at ${width}px in ${browserName}`).toBeLessThanOrEqual(dimensions.viewport);
+    await page.screenshot({
+      path: testInfo.outputPath(`homepage-${browserName}-${width}.png`),
+      fullPage: true,
+      animations: "disabled"
+    });
+  }
+});
