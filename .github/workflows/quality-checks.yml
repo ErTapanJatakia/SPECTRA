@@ -6,7 +6,7 @@ on:
     paths-ignore:
       - "package-lock.json"
   pull_request:
-    branches: [main]
+    branches: [main, feature/stage-06a-peacekeeping-hub]
   workflow_dispatch:
   workflow_run:
     workflows: ["SPECTRA npm Lockfile"]
@@ -51,6 +51,15 @@ jobs:
 
       - name: Run cross-browser end-to-end tests
         run: npm run test:e2e
+
+      - name: Upload browser visual review screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spectra-homepage-visual-review
+          path: test-results/
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Verify production offline application shell
         run: npm run test:e2e:offline

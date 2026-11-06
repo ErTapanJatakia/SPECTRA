@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import "./dashboard.css";
 import DomainCard from "../components/DomainCard";
 import Icon from "../components/Icon";
 import { domains } from "../data/domains";
