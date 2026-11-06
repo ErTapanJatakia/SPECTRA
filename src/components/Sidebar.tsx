@@ -24,7 +24,7 @@ export default function Sidebar({ open, onNavigate }: SidebarProps) {
         <p>Independent educational and research initiative.</p>
       </div>
 
-      <nav className="sidebar-nav">
+      <nav id="main-navigation" className="sidebar-nav" aria-label="Primary">
         {navigationGroups.map((group) => (
           <section className="nav-group" key={group.id}>
             <h2>{group.label}</h2>
