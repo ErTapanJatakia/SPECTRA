@@ -7,7 +7,29 @@ test("global skip link is the first keyboard stop and becomes visible on focus",
   await expect(skipLink).toBeFocused();
   await expect(skipLink).toBeInViewport();
   await expect(skipLink).toHaveAttribute("href", "#main-content");
-  await expect(page.locator("#main-content")).toBeVisible();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#main-content")).toBeFocused();
+});
+
+test("mobile navigation supports Escape and restores focus to its trigger", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/peacekeeping");
+  const menuButton = page.getByRole("button", { name: "Open navigation" });
+  await menuButton.click();
+  await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Overview" })).toBeFocused();
+  await expect(page.getByRole("button", { name: "Close navigation" })).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("navigation", { name: "Primary" })).not.toHaveClass(/sidebar-open/);
+  await expect(page.getByRole("button", { name: "Open navigation" })).toBeFocused();
+});
+
+test("mobile navigation exposes landmarks and announces route changes", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/peacekeeping");
+  await expect(page.getByRole("main")).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Primary" })).toBeAttached();
+  await expect(page.locator('[aria-live="polite"]')).toContainText("UN Peacekeeping page loaded");
 });
 
 test("Peacekeeping resource links use HTTPS and official UN hostnames", async ({ page }) => {
