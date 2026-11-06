@@ -18,7 +18,7 @@ test("mobile navigation supports Escape and restores focus to its trigger", asyn
   await menuButton.click();
   await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Overview" })).toBeFocused();
-  await expect(page.getByRole("button", { name: "Close navigation" })).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("banner").getByRole("button", { name: "Close navigation" })).toHaveAttribute("aria-expanded", "true");
   await page.keyboard.press("Escape");
   await expect(page.getByRole("navigation", { name: "Primary" })).not.toHaveClass(/sidebar-open/);
   await expect(page.getByRole("button", { name: "Open navigation" })).toBeFocused();
@@ -51,7 +51,7 @@ test("Peacekeeping resource links use HTTPS and official UN hostnames", async ({
     expect(url.protocol).toBe("https:");
     expect(url.hostname.endsWith(".un.org") || url.hostname.endsWith(".unmissions.org")).toBe(true);
     expect(destination.target).toBe("_blank");
-    expect(destination.rel.split(/\s+/)).toContain("noreferrer");
+    expect(destination.rel.split(/\\s+/)).toContain("noreferrer");
   }
 });
 
