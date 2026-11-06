@@ -6,7 +6,7 @@ on:
     paths-ignore:
       - "package-lock.json"
   pull_request:
-    branches: [main]
+    branches: [main, feature/stage-06a-peacekeeping-hub]
   workflow_dispatch:
   workflow_run:
     workflows: ["SPECTRA npm Lockfile"]
