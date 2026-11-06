@@ -71,6 +71,7 @@ test("theme subtle-text tokens meet WCAG AA contrast against shared surfaces", a
   const theme = page.getByLabel("Visual theme");
   for (const mode of ["light", "dark", "contrast"]) {
     await theme.selectOption(mode);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", mode);
     const ratios = await page.evaluate(() => {
       const style = getComputedStyle(document.documentElement);
       const subtle = style.getPropertyValue("--subtle").trim();
