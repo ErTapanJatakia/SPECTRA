@@ -51,7 +51,7 @@ test("Peacekeeping resource links use HTTPS and official UN hostnames", async ({
     expect(url.protocol).toBe("https:");
     expect(url.hostname.endsWith(".un.org") || url.hostname.endsWith(".unmissions.org")).toBe(true);
     expect(destination.target).toBe("_blank");
-    expect(destination.rel.split(/\\s+/)).toContain("noreferrer");
+    expect(destination.rel.split(/\s+/)).toContain("noreferrer");
   }
 });
 
