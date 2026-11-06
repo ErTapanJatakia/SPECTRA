@@ -53,10 +53,47 @@ test("global search finds equipment as well as divisions", async ({ page }) => {
   await expect(page.getByRole("heading", { name:"Mogami-Class Multi-Mission Frigate" })).toBeVisible();
 });
 
-test("theme preference can be changed", async ({ page }) => {
+test("theme preference can be changed across all available modes", async ({ page }) => {
   await page.goto("/");
-  await page.getByLabel("Visual theme").selectOption("contrast");
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "contrast");
+  const theme = page.getByLabel("Visual theme");
+  for (const mode of ["light", "dark", "contrast", "system"]) {
+    await theme.selectOption(mode);
+    if (mode === "system") {
+      await expect(page.locator("html")).toHaveAttribute("data-theme", /^(light|dark)$/);
+    } else {
+      await expect(page.locator("html")).toHaveAttribute("data-theme", mode);
+    }
+  }
+});
+
+test("theme subtle-text tokens meet WCAG AA contrast against shared surfaces", async ({ page }) => {
+  await page.goto("/");
+  const theme = page.getByLabel("Visual theme");
+  for (const mode of ["light", "dark", "contrast"]) {
+    await theme.selectOption(mode);
+    const ratios = await page.evaluate(() => {
+      const style = getComputedStyle(document.documentElement);
+      const subtle = style.getPropertyValue("--subtle").trim();
+      const backgrounds = ["--page", "--page-glow", "--surface", "--surface-2", "--surface-3", "--accent-soft"]
+        .map((token) => style.getPropertyValue(token).trim());
+      const rgb = (hex: string) => {
+        const value = hex.replace("#", "");
+        return [0, 2, 4].map((offset) => parseInt(value.slice(offset, offset + 2), 16) / 255);
+      };
+      const luminance = (hex: string) => {
+        const channels = rgb(hex).map((value) => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+        return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+      };
+      const foreground = luminance(subtle);
+      return backgrounds.map((background) => {
+        const surface = luminance(background);
+        const lighter = Math.max(foreground, surface);
+        const darker = Math.min(foreground, surface);
+        return (lighter + 0.05) / (darker + 0.05);
+      });
+    });
+    expect(Math.min(...ratios), `subtle text contrast in ${mode} theme`).toBeGreaterThanOrEqual(4.5);
+  }
 });
 
 test("3D Studio opens with the educational demonstration model", async ({ page }) => {
