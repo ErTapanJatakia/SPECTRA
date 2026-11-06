@@ -119,12 +119,12 @@ img, svg { max-width: 100%; }
 }
 
 .skip-link {
-  position: fixed; top: 8px; left: 8px; z-index: 100;
+  position: fixed; top: -80px; left: 8px; z-index: 100;
   padding: 10px 14px; color: var(--text); background: var(--surface);
   border: 2px solid var(--focus); border-radius: 8px; font-size: 12px; font-weight: 750;
-  box-shadow: var(--shadow-soft); transform: translateY(-160%);
+  box-shadow: var(--shadow-soft); transition: top .16s ease;
 }
-.skip-link:focus-visible { transform: translateY(0); }
+.skip-link:focus { top: 8px; }
 
 #root { min-height: 100vh; }
 .app-frame {
